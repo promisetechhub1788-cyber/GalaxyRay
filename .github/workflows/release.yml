@@ -139,7 +139,7 @@ jobs:
         run: |
           set -euo pipefail
           docker run -d --name sg -p 3000:3000 \
-            -e STELLAR_GATEWAY_PUBLIC=UNCONFIGURED \
+            -e GALAXYRAY_PUBLIC=UNCONFIGURED \
             -e WEBHOOK_SECRET=$(openssl rand -hex 32) \
             galaxyray:ci
           for i in $(seq 1 30); do

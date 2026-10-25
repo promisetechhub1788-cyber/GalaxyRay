@@ -869,7 +869,7 @@ pub async fn run_trustline_checker(
 ) -> crate::supervise::TaskExit {
     if !state.config.gateway_configured() {
         return crate::supervise::TaskExit::DisabledByConfig(
-            "galaxy_rayWAY_PUBLIC is unconfigured",
+            "GALAXYRAY_PUBLIC is unconfigured",
         );
     }
 
@@ -1408,7 +1408,7 @@ fn next_poll_delay(consecutive_failures: u32, retry_after: Option<Duration>) -> 
 /// by the next success.
 pub async fn run_poller(state: Arc<AppState>, mut shutdown: watch::Receiver<bool>) {
     if !state.config.gateway_configured() {
-        warn!("galaxy_rayWAY_PUBLIC is unconfigured; Horizon poller disabled");
+        warn!("GALAXYRAY_PUBLIC is unconfigured; Horizon poller disabled");
         return;
     }
 
@@ -1509,7 +1509,7 @@ fn parse_sse_block(block: &str) -> SseEvent {
 /// connecting) while no gateway is configured.
 pub async fn run_stream_listener(state: Arc<AppState>, mut shutdown: watch::Receiver<bool>) {
     if !state.config.gateway_configured() {
-        warn!("galaxy_rayWAY_PUBLIC is unconfigured; Horizon stream listener disabled");
+        warn!("GALAXYRAY_PUBLIC is unconfigured; Horizon stream listener disabled");
         return;
     }
 

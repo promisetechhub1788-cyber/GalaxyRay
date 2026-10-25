@@ -154,7 +154,7 @@ export default defineConfig({
       DATABASE_URL: `sqlite:${DB_FILE}`,
       /* Leaving the gateway unconfigured keeps the Horizon stream and poller
          idle, so the suite needs no Stellar node and no network. */
-      galaxy_rayWAY_PUBLIC: "UNCONFIGURED",
+      GALAXYRAY_PUBLIC: "UNCONFIGURED",
       STELLAR_NETWORK: "testnet",
       WEBHOOK_SECRET,
       ADMIN_PROVISIONING_SECRET: WEBHOOK_SECRET,

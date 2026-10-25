@@ -475,7 +475,7 @@ async fn shutdown_causes_prompt_exit() {
 }
 
 /// `run_stream_listener` returns `TaskExit::DisabledByConfig` immediately when
-/// `galaxy_rayWAY_PUBLIC` is not set, without connecting to Horizon at all.
+/// `GALAXYRAY_PUBLIC` is not set, without connecting to Horizon at all.
 #[tokio::test]
 async fn unconfigured_gateway_exits_disabled_by_config() {
     let server = MockServer::start().await;

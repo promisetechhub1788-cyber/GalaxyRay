@@ -226,7 +226,7 @@ impl Config {
         let horizon_url = std::env::var("STELLAR_HORIZON_URL")
             .unwrap_or_else(|_| "https://horizon-testnet.stellar.org".to_string());
         let gateway_public =
-            std::env::var("galaxy_rayWAY_PUBLIC").unwrap_or_else(|_| "UNCONFIGURED".to_string());
+            std::env::var("GALAXYRAY_PUBLIC").unwrap_or_else(|_| "UNCONFIGURED".to_string());
         let webhook_secret = Self::validate_webhook_secret(std::env::var("WEBHOOK_SECRET"))?;
         let allowed_webhook_schemes: Vec<String> = {
             let raw_schemes =
@@ -386,7 +386,7 @@ impl Config {
         if self.gateway_configured() {
             crate::strkey::validate_account_id(&self.gateway_public).map_err(|e| {
                 anyhow::anyhow!(
-                    "galaxy_rayWAY_PUBLIC ({}) is not a valid Stellar account address: {e}",
+                    "GALAXYRAY_PUBLIC ({}) is not a valid Stellar account address: {e}",
                     self.gateway_public
                 )
             })?;
@@ -965,7 +965,7 @@ mod tests {
         // A valid key with one character flipped — a realistic typo.
         cfg.gateway_public = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLB5".into();
         let err = cfg.validate_addresses().unwrap_err().to_string();
-        assert!(err.contains("galaxy_rayWAY_PUBLIC"), "got: {err}");
+        assert!(err.contains("GALAXYRAY_PUBLIC"), "got: {err}");
     }
 
     #[test]
@@ -1108,11 +1108,11 @@ mod tests {
                 ),
                 ("DATABASE_URL", Some("sqlite::memory:")),
                 (
-                    "galaxy_rayWAY_PUBLIC",
+                    "GALAXYRAY_PUBLIC",
                     Some("GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"),
                 ),
                 (
-                    "galaxy_rayWAY_SECRET",
+                    "GALAXYRAY_SECRET",
                     Some("SCZANGBA5RLKJHTBF4RJNRJMZWI4VKTHCRKOVAH7LRZZPZHHZWATAWBN"),
                 ),
                 ("CORS_ALLOWED_ORIGINS", Some("https://example.com")),
@@ -1140,11 +1140,11 @@ mod tests {
                 ),
                 ("DATABASE_URL", Some("sqlite::memory:")),
                 (
-                    "galaxy_rayWAY_PUBLIC",
+                    "GALAXYRAY_PUBLIC",
                     Some("GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"),
                 ),
                 (
-                    "galaxy_rayWAY_SECRET",
+                    "GALAXYRAY_SECRET",
                     Some("SCZANGBA5RLKJHTBF4RJNRJMZWI4VKTHCRKOVAH7LRZZPZHHZWATAWBN"),
                 ),
             ],

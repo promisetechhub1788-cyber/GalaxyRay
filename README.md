@@ -149,7 +149,7 @@ git clone https://github.com/GalaxyRayLabs/GalaxyRay.git
 cd GalaxyRay
 
 cp .env.example .env
-# Edit .env — at minimum set galaxy_rayWAY_PUBLIC, WEBHOOK_SECRET,
+# Edit .env — at minimum set GALAXYRAY_PUBLIC, WEBHOOK_SECRET,
 # and ADMIN_PROVISIONING_SECRET
 
 cargo run
@@ -265,7 +265,7 @@ All configuration is via environment variables, read once at startup. **Invalid 
 | `DATABASE_URL` | sqlx connection string (not a file path) | `sqlite:GalaxyRay.db` |
 | `STELLAR_NETWORK` | `testnet` or `public` | `testnet` |
 | `STELLAR_HORIZON_URL` | Horizon endpoint | testnet Horizon |
-| `galaxy_rayWAY_PUBLIC` | Gateway wallet public key (`G…`), validated as a strkey at startup. The listener stays idle until this is set. | — |
+| `GALAXYRAY_PUBLIC` | Gateway wallet public key (`G…`), validated as a strkey at startup. The listener stays idle until this is set. | — |
 | `ACCEPTED_ASSETS` | Comma-separated. Only native XLM may be written as a bare `CODE`. Every other asset is `CODE:ISSUER` (`USDC:GA…`). A typo like `ACCEPTED_ASSETS=XLM,USDC` used to treat native XLM as settling USDC intents; boot now refuses it (issue #221). Duplicate codes are also refused (issue #222). Each issuer is strkey-validated. Adding an asset is config-only — but see [Trustlines](#trustlines). | `XLM,USDC:<testnet issuer>` |
 | `REQUEST_TIMEOUT_SECS` | Whole-request timeout; exceeding it returns `408` | `30` |
 | `MAX_PAYMENT_AMOUNT` | Maximum amount `POST /payments` accepts, in the asset's own units. A bare number (`100000`) applies to every asset; `CODE:AMOUNT` (`USDC:50000`) pins a bound to one asset specifically and always wins over the default; mix both with commas (`100000,USDC:50000`). Exceeding it returns `400 amount_out_of_range` naming the configured limit — distinct from `invalid_amount`, which means the value itself is malformed. Unset means no bound beyond `i64` overflow in `parse_stroops` (issue #310). | unset |
@@ -356,7 +356,7 @@ chance to confirm.
 To check what the account currently trusts directly against Horizon:
 
 ```bash
-curl -s "https://horizon-testnet.stellar.org/accounts/$galaxy_rayWAY_PUBLIC" \
+curl -s "https://horizon-testnet.stellar.org/accounts/$GALAXYRAY_PUBLIC" \
   | jq '.balances[] | {asset: (.asset_code // "XLM"), issuer: .asset_issuer}'
 ```
 
