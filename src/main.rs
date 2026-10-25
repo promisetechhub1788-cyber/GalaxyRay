@@ -14,8 +14,10 @@ use galaxyray::{
     metrics::{
         AuthMetrics, HorizonMetrics, HttpMetrics, PaymentMetrics, TrustlineMetrics, WebhookMetrics,
     },
-    retention, supervise, webhook,
+    retention, subscriptions, supervise, webhook,
 };
+use moka::sync::Cache;
+use std::time::Duration;
 use tokio::sync::watch;
 use tokio::task::JoinHandle;
 use tracing::{info, warn};
@@ -85,6 +87,9 @@ async fn main() -> Result<()> {
         payment_metrics: PaymentMetrics::new(),
         task_health: TaskHealth::new(),
         config: cfg,
+        analytics_cache: moka::sync::CacheBuilder::new(1000)
+            .time_to_live(Duration::from_secs(60))
+            .build(),
     });
 
     if state.config.gateway_configured() {
@@ -100,6 +105,7 @@ async fn main() -> Result<()> {
     health.require("retention");
     health.require("trustline_checker");
     health.require("redrive");
+    health.require("subscriptions");
     if state.config.listener_mode == ListenerMode::Stream {
         health.require("stream");
     }
@@ -134,7 +140,12 @@ async fn main() -> Result<()> {
     let redrive = supervise::supervise(
         health.clone(),
         "redrive",
-        webhook::run_redrive_worker(state.clone(), shutdown_rx),
+        webhook::run_redrive_worker(state.clone(), shutdown_rx.clone()),
+    );
+    let subscriptions = supervise::supervise(
+        health.clone(),
+        "subscriptions",
+        subscriptions::run_scheduler(state.clone(), shutdown_rx.clone()),
     );
 
     let addr = format!("0.0.0.0:{}", state.config.port);
@@ -164,6 +175,7 @@ async fn main() -> Result<()> {
         join_task(sweeper, "sweeper", &health).await;
         join_task(redrive, "redrive", &health).await;
         join_task(retention, "retention", &health).await;
+        join_task(subscriptions, "subscriptions", &health).await;
         join_task(trustline_checker, "trustline_checker", &health).await;
         if let Some(handle) = stream {
             join_task(handle, "stream", &health).await;

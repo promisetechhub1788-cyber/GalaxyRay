@@ -1333,6 +1333,164 @@ The operator dashboard. Also serves `/dashboard/app.css` and
 
 ---
 
+## Analytics
+
+Three read-only endpoints provide aggregated metrics on a merchant's payment activity. All endpoints require Bearer token auth and return results specific to the authenticated merchant.
+
+### Endpoints
+
+**GET /v1/merchants/{merchant_id}/analytics/summary**
+- Returns total payment count, completed count, average amount, and total settled
+- Cached in-memory for 60 seconds per merchant
+
+**GET /v1/merchants/{merchant_id}/analytics/by-status**
+- Returns payment count breakdown by status (pending, completed, failed, expired, overpaid, underpaid)
+- Cached in-memory for 60 seconds per merchant
+
+**GET /v1/merchants/{merchant_id}/analytics/by-asset**
+- Returns payment counts and total amounts grouped by asset
+- Cached in-memory for 60 seconds per merchant
+
+### Auth
+
+All analytics endpoints require the Bearer token auth middleware. Requesting a different merchant_id than the authenticated merchant returns `403 Forbidden`.
+
+### Example
+
+```bash
+curl -H "Authorization: Bearer $API_KEY" \
+  http://localhost:3000/v1/merchants/your-merchant-id/analytics/summary
+```
+
+Response:
+```json
+{
+  "total_payments": 42,
+  "completed_count": 40,
+  "average_amount_stroops": "1500000",
+  "total_settled_stroops": "63000000"
+}
+```
+
+---
+
+## Invoices
+
+Merchants can create and track manual invoices manually without automatic PDF/QR generation. Invoices can optionally be linked to payment intents after creation.
+
+### Endpoints
+
+**POST /v1/merchants/{merchant_id}/invoices**
+- Create a new invoice
+- Auto-generates a sequential invoice_number per merchant
+- Status defaults to 'draft'
+- Required fields: customer_name, customer_email, amount_stroops, asset (defaults to native XLM)
+
+**GET /v1/merchants/{merchant_id}/invoices**
+- List all invoices for the merchant
+- Returns invoices in reverse chronological order
+
+**GET /v1/merchants/{merchant_id}/invoices/{invoice_id}**
+- Fetch a specific invoice
+
+**PATCH /v1/merchants/{merchant_id}/invoices/{invoice_id}**
+- Update invoice status
+- Valid statuses: draft, sent, paid, cancelled
+- Returns 400 Bad Request for invalid status values
+
+**POST /v1/merchants/{merchant_id}/invoices/{invoice_id}/link**
+- Link an existing payment to an invoice (optional linking, both must belong to merchant)
+- Required field: payment_id
+
+### Auth
+
+All invoice endpoints require Bearer token auth. Requesting a different merchant_id than the authenticated merchant returns `403 Forbidden`.
+
+### Example
+
+```bash
+# Create invoice
+curl -X POST \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_name": "Acme Corp",
+    "customer_email": "billing@acme.com",
+    "amount_stroops": "5000000",
+    "asset": "USDC"
+  }' \
+  http://localhost:3000/v1/merchants/your-merchant-id/invoices
+
+# Update status
+curl -X PATCH \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "sent"}' \
+  http://localhost:3000/v1/merchants/your-merchant-id/invoices/{invoice_id}
+```
+
+---
+
+## Subscriptions
+
+Merchants can create recurring subscription schedules that automatically generate payment intents. A background scheduler runs every 60 seconds, checking for subscriptions due by their next_charge_date and creating payment intents with a memo prefix `SUB-`.
+
+### Endpoints
+
+**POST /v1/merchants/{merchant_id}/subscriptions**
+- Create a subscription schedule
+- Required fields: amount_stroops, asset, frequency, max_retries (optional, defaults to 3)
+- Frequency: 'daily', 'weekly', or 'monthly'
+- max_retries: 0-10 (bounds enforced, 400 on out-of-range)
+- Status defaults to 'active'
+
+**GET /v1/merchants/{merchant_id}/subscriptions**
+- List active subscriptions for the merchant
+- Returns only subscriptions with status='active'
+
+**PATCH /v1/merchants/{merchant_id}/subscriptions/{subscription_id}**
+- Update subscription status
+- Valid statuses: active, paused, cancelled
+- Paused subscriptions will not generate charges; cancelled subscriptions are terminal
+
+### Charge Lifecycle
+
+- When a subscription's `next_charge_date <= today`, a background scheduler:
+  - Creates a payment intent with memo format `SUB-{first 8 UUID chars}`
+  - Records the charge in subscription_charges table with status='pending'
+  - Advances `next_charge_date` based on frequency (daily +1 day, weekly +7 days, monthly +1 month)
+- When the payment settles to 'completed', the pending charge is marked 'completed'
+- Merchants can inspect subscription charges through the subscriptions list and detail endpoints (subject to future API expansion)
+
+### Auth
+
+All subscription endpoints require Bearer token auth. Requesting a different merchant_id than the authenticated merchant returns `403 Forbidden`.
+
+### Example
+
+```bash
+# Create subscription
+curl -X POST \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount_stroops": "10000000",
+    "asset": "native",
+    "frequency": "daily",
+    "max_retries": 5
+  }' \
+  http://localhost:3000/v1/merchants/your-merchant-id/subscriptions
+
+# Pause subscription
+curl -X PATCH \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "paused"}' \
+  http://localhost:3000/v1/merchants/your-merchant-id/subscriptions/{subscription_id}
+```
+
+---
+
 ## Payment Resolution Policy
 
 Every on-chain payment matched by memo, destination, and asset resolves as follows:

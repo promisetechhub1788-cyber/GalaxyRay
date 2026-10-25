@@ -27,6 +27,9 @@ use tower_http::{
 };
 
 mod payments;
+mod analytics;
+mod invoices;
+mod subscriptions;
 
 /// Reject request bodies larger than this (256 KiB) before they hit a handler.
 const MAX_BODY_BYTES: usize = 256 * 1024;
@@ -377,6 +380,44 @@ fn api_v1(
         auth_middleware,
     ));
 
+    /* Analytics endpoints: read-only aggregations of payment data */
+    let analytics_authed = |m: axum::routing::MethodRouter<Arc<AppState>>| {
+        m.route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth_middleware,
+        ))
+    };
+
+    let analytics = axum::Router::new()
+        .route("/summary", analytics_authed(get(analytics::summary)))
+        .route("/by-status", analytics_authed(get(analytics::by_status)))
+        .route("/by-asset", analytics_authed(get(analytics::by_asset)));
+
+    /* Invoices endpoints: manual invoice register */
+    let invoices_authed = |m: axum::routing::MethodRouter<Arc<AppState>>| {
+        m.route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth_middleware,
+        ))
+    };
+
+    let invoices = axum::Router::new()
+        .route("/", invoices_authed(post(invoices::create).get(invoices::list)))
+        .route("/{invoice_id}", invoices_authed(get(invoices::get).patch(invoices::update_status)))
+        .route("/{invoice_id}/link", invoices_authed(post(invoices::link_payment)));
+
+    /* Subscriptions endpoints: recurring charge scheduling */
+    let subscriptions_authed = |m: axum::routing::MethodRouter<Arc<AppState>>| {
+        m.route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth_middleware,
+        ))
+    };
+
+    let subscriptions = axum::Router::new()
+        .route("/", subscriptions_authed(post(subscriptions::create).get(subscriptions::list)))
+        .route("/{subscription_id}", subscriptions_authed(patch(subscriptions::update_status)));
+
     axum::Router::new().nest("/merchants", merchants).nest(
         "/payments",
         axum::Router::new()
@@ -388,6 +429,9 @@ fn api_v1(
               own payment has no API key. See `payments::get_by_id`. */
             .route("/{id}", get(payments::get_by_id)),
     )
+    .nest("/merchants/{merchant_id}/analytics", analytics)
+    .nest("/merchants/{merchant_id}/invoices", invoices)
+    .nest("/merchants/{merchant_id}/subscriptions", subscriptions)
 }
 
 /// Tag a response served from an unversioned path as deprecated.

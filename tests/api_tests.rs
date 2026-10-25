@@ -89,6 +89,7 @@ async fn server_with_config(cfg: Config) -> (TestServer, db::Db) {
         http_metrics: galaxyray::metrics::HttpMetrics::new(),
         payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
         task_health: galaxyray::TaskHealth::new(),
+        analytics_cache: moka::sync::Cache::new(1000),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     let server = TestServer::new(router);

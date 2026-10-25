@@ -499,6 +499,95 @@ pub async fn migrate(pool: &Db) -> Result<()> {
             .await?;
     }
 
+    // ── Feature 2: Invoice Metadata Tracking ────────────────────────────────────
+
+    /* Add invoice_id column to payments for optional linking (nullable, no foreign key yet) */
+    let has_invoice_id: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM pragma_table_info('payments') WHERE name = 'invoice_id'",
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+    if has_invoice_id == 0 {
+        sqlx::query("ALTER TABLE payments ADD COLUMN invoice_id TEXT")
+            .execute(&mut *tx)
+            .await?;
+    }
+
+    /* Invoices table: manual invoice register for merchants */
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS invoices (
+            id TEXT PRIMARY KEY,
+            merchant_id TEXT NOT NULL,
+            invoice_number TEXT NOT NULL,
+            customer_name TEXT NOT NULL,
+            customer_email TEXT NOT NULL,
+            amount_stroops TEXT NOT NULL,
+            asset TEXT NOT NULL DEFAULT 'XLM',
+            status TEXT NOT NULL DEFAULT 'draft',
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+            linked_payment_id TEXT
+        )",
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "CREATE INDEX IF NOT EXISTS idx_invoices_merchant_created ON invoices(merchant_id, created_at DESC)",
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_invoices_merchant_number ON invoices(merchant_id, invoice_number)")
+        .execute(&mut *tx)
+        .await?;
+
+    // ── Feature 3: Subscription Scheduling ──────────────────────────────────────
+
+    /* Subscriptions table: recurring charge definitions */
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS subscriptions (
+            id TEXT PRIMARY KEY,
+            merchant_id TEXT NOT NULL,
+            amount_stroops TEXT NOT NULL,
+            asset TEXT NOT NULL DEFAULT 'XLM',
+            frequency TEXT NOT NULL,
+            next_charge_date TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            max_retries INTEGER NOT NULL DEFAULT 3,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+        )",
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "CREATE INDEX IF NOT EXISTS idx_subscriptions_merchant_status_date ON subscriptions(merchant_id, status, next_charge_date)",
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    /* Subscription charges table: records of individual charges created by the scheduler */
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS subscription_charges (
+            id TEXT PRIMARY KEY,
+            subscription_id TEXT NOT NULL,
+            charge_date TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            attempts INTEGER NOT NULL DEFAULT 0,
+            last_error TEXT,
+            last_attempt_at TEXT
+        )",
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "CREATE INDEX IF NOT EXISTS idx_subscription_charges_sub_date ON subscription_charges(subscription_id, charge_date)",
+    )
+    .execute(&mut *tx)
+    .await?;
+
     tx.commit().await?;
     Ok(())
 }

@@ -1352,6 +1352,16 @@ async fn settle(
         }
         Ok(true) => {}
     }
+
+    // If this payment settles to 'completed', mark any pending subscription charges as completed
+    if status == "completed" {
+        if let Err(e) = subscriptions::mark_charges_completed(
+            &state.pool,
+            &payment.id,
+        ).await {
+            warn!(payment_id = %payment.id, error = %e, "failed to update subscription charges");
+        }
+    }
     let settlement_latency_secs = elapsed_secs(&payment.created_at);
     info!(
         payment_id = %payment.id,

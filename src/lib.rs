@@ -11,10 +11,12 @@ pub mod ssrf;
 pub mod strkey;
 pub mod supervise;
 pub mod webhook;
+pub mod subscriptions;
 
 use std::collections::{HashMap, HashSet};
 use std::sync::atomic::{AtomicBool, AtomicI64, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use moka::sync::Cache;
 
 /// Number of consecutive panics that puts a task into the crash-loop state.
 /// Exposed as a `pub const` so tests in `supervise.rs` can reference it
@@ -315,4 +317,23 @@ impl Default for TaskHealth {
     fn default() -> Self {
         Self::new()
     }
+}
+
+// ── Application State ─────────────────────────────────────────────────────────
+
+/// Shared application state passed to every route handler and background task.
+pub struct AppState {
+    pub pool: db::Db,
+    pub http: reqwest::Client,
+    pub webhook_http: reqwest::Client,
+    pub webhook_metrics: metrics::WebhookMetrics,
+    pub auth_metrics: metrics::AuthMetrics,
+    pub horizon_metrics: metrics::HorizonMetrics,
+    pub trustline_metrics: metrics::TrustlineMetrics,
+    pub http_metrics: metrics::HttpMetrics,
+    pub payment_metrics: metrics::PaymentMetrics,
+    pub task_health: TaskHealth,
+    pub config: config::Config,
+    /// In-memory cache for analytics endpoints (60-second TTL per entry).
+    pub analytics_cache: moka::sync::Cache<String, String>,
 }

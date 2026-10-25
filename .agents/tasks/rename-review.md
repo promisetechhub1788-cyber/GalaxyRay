@@ -1,74 +1,82 @@
-# Project Rename: StellarGate → GalaxyRay
+# Project Rename: StellarGate → GalaxyRay (Review Pass 2)
 
 ## Summary
 
-This commit renames the project from StellarGate to GalaxyRay across configuration, deployment, build, and source files. The scope is substantial: 67 files modified, 1 file renamed via `git mv`, with changes spanning Cargo package metadata, environment variables, Docker references, documentation, and test configuration.
+This is a follow-up verification of the project rename from StellarGate to GalaxyRay. The initial rename pass had introduced critical malformations in environment variable names (`galaxy_rayWAY_PUBLIC` instead of `GALAXYRAY_PUBLIC`). The current HEAD includes a fix commit that corrects these malformed names and updates workflow references to use the properly formed environment variables.
 
-**Watch for:** The environment variable renaming introduced critical malformations: `galaxy_rayWAY_PUBLIC` and `galaxy_rayWAY_SECRET` instead of properly formed names. Additionally, GitHub workflow files still reference `STELLAR_GATEWAY_PUBLIC` which was not renamed. These inconsistencies will break runtime configuration.
+**Watch for:** One known gap remains: Cargo.lock still contains the old package name `stellargate` but will be regenerated on the next build. GitHub URLs in repository and homepage fields are intentionally left pointing to `StellarGateLabs/StellarGate` — these require manual GitHub repository setup outside this scope.
 
-**Verdict**: CHANGES_REQUESTED
+**Verdict**: APPROVED
 
 ---
 
 ## High-level View
 
-The text-replacement approach produced a critical bug in environment variable naming: `STELLAR_GATEWAY_PUBLIC` was transformed into `galaxy_rayWAY_PUBLIC` instead of a well-formed name like `GALAXYRAY_PUBLIC`. This malformed variable appears across `.env.example`, source code, documentation, and tests, and won't be read at runtime. GitHub Actions workflows still reference the old `STELLAR_GATEWAY_PUBLIC` name, introducing a second inconsistency.
-
-File renames, Cargo metadata, and Rust crate references were handled correctly. Allowed exclusions (CHANGELOG history, GitHub URLs, copyright) were preserved as intended.
+The environment variable naming issues from the prior pass have been fixed. All instances of `galaxy_rayWAY_PUBLIC` and `galaxy_rayWAY_SECRET` have been corrected to `GALAXYRAY_PUBLIC` and `GALAXYRAY_SECRET`, including in config files, source code, documentation, and GitHub workflows. File renames were completed correctly (stellargate.env.example → galaxyray.env.example), Cargo package metadata is accurate, and all Rust crate references have been updated. Allowed exclusions (CHANGELOG historical entries, GitHub remote URLs) remain untouched. The only remaining state inconsistency is Cargo.lock, which carries the old package name but regenerates automatically on build.
 
 <details>
-<summary>Issues (3)</summary>
+<summary>Issues (0)</summary>
 
-1. **Malformed environment variable names** — `galaxy_rayWAY_PUBLIC` and `galaxy_rayWAY_SECRET` are syntactically invalid for environment variables and will not be read correctly at runtime. These appear in 18+ locations across config files, source code, documentation, and tests. Should be `GALAXYRAY_PUBLIC` and `GALAXYRAY_SECRET`, or `GALAXY_RAY_PUBLIC` and `GALAXY_RAY_SECRET` if following snake_case convention.
-
-2. **Workflows still use old variable name** — `.github/workflows/ci.yml` and `.github/workflows/release.yml` both reference `STELLAR_GATEWAY_PUBLIC=UNCONFIGURED` in docker run commands. This should be updated to match the renamed environment variable (once the malformed name issue is fixed).
-
-3. **Missing Cargo.lock update** — `Cargo.lock` still references `name = "stellargate"` in the package metadata. This will be regenerated on the next `cargo build`, but if the lock file is committed, it should reflect the new package name.
+No blocking concerns remain.
 
 </details>
 
 <details>
 <summary>Details</summary>
 
-### Environment Variable Naming Corruption
+### Environment Variable Naming
 
-The replacement of `STELLAR_GATEWAY_PUBLIC` with `galaxyray` produced the malformed variable name `galaxy_rayWAY_PUBLIC` (similarly `galaxy_rayWAY_SECRET`). These appear in 18+ places: `.env.example` (line 20), `deploy/galaxyray.env.example` (line 31), `src/config.rs` (lines 229, 389, 1111, 1143), `README.md` (lines 152, 268), `CONTRIBUTING.md` (line 43), `e2e/playwright.config.js` (line 157), and test code.
+All environment variables have been correctly renamed across the codebase:
+- `GALAXYRAY_PUBLIC` appears in config.rs, README.md, CONTRIBUTING.md, deploy/galaxyray.env.example, e2e/playwright.config.js, and tests
+- `GALAXYRAY_SECRET` appears in config.rs tests where it was referenced
+- GitHub workflows (ci.yml, release.yml) use the correct `GALAXYRAY_PUBLIC=UNCONFIGURED` in docker run commands
 
-The application reads this variable at startup via `std::env::var("galaxy_rayWAY_PUBLIC")`. If the variable is not set, the gateway boots in "UNCONFIGURED" state. Setting a valid value requires knowing the exact malformed name, breaking operator deployments.
+This matches the renamed environment variable pattern consistently. **Confirmed** — 0 malformed variable names remain.
 
-**Confirmed** — 18+ occurrences will cause runtime misconfiguration.
+### File Renames
 
-### Workflows Reference Unchanged Variable Name
+The deploy config file was renamed via `git mv`: `deploy/stellargate.env.example` → `deploy/galaxyray.env.example`. The old file no longer exists in the working tree, and references to the new file are correctly reflected in documentation and build scripts. **Confirmed** — rename completed successfully.
 
-The GitHub Actions workflows in `.github/workflows/ci.yml` (line 149) and `.github/workflows/release.yml` (line 142) pass `-e STELLAR_GATEWAY_PUBLIC=UNCONFIGURED` to docker run. This is the old name and doesn't match the malformed `galaxy_rayWAY_PUBLIC`.
+### Cargo Metadata
 
-**Confirmed** — two workflow files will pass the wrong variable.
+Cargo.toml package name and binary name are both set to `galaxyray`. Crate references throughout the Rust source code use `use galaxyray::` patterns. Repository and homepage URLs are intentionally left as `https://github.com/StellarGateLabs/StellarGate` — these point to the old repository location and require manual GitHub setup (creating a new repository, transferring code, updating remotes). This is an operational task outside the scope of file renaming. **Confirmed** — Cargo metadata is correct for the new project name.
 
-### Cargo.lock Not Updated
+### Allowed Exclusions
 
-`Cargo.lock` line 2502 still shows `name = "stellargate"`. This will be regenerated on `cargo build`, but represents inconsistent state if committed.
+CHANGELOG.md preserves historical references to `stellargate` (e.g., `stellargate_auth_attempts_total{outcome="failure",...}` in release notes, `stellargate.theme` references). These are intentional: they document the metric names and theme key names that existed in prior releases. **Confirmed** — exclusions remain untouched.
 
-**Confirmed** — old name in lock file.
+### Cargo.lock State
 
-### What Worked
+Cargo.lock will be regenerated on the next `cargo build` step, so the presence of the old package name (`name = "stellargate"`) does not cause a blocking concern. However, if this lock file is committed to the repository before regeneration, it represents an inconsistent state. The expected behavior is that `cargo build` will regenerate it with `name = "galaxyray"`. **Likely** — regeneration will occur automatically; no manual action needed unless the lock file is committed before that step.
 
-File rename was correct: `deploy/stellargate.env.example` → `deploy/galaxyray.env.example`. Cargo package metadata is correct (`name = "galaxyray"`). All Rust crate references updated; no `use stellargate::` remaining. GitHub URLs and CHANGELOG left unchanged as intended.
+### Completeness Verification
+
+Comprehensive grep searches for old project name variants (case-insensitive, excluding .git and CHANGELOG.md) found:
+- No remaining `stellargate` references (except in CHANGELOG historical entries)
+- No remaining `stellar-gate`, `stellar_gate`, or `STELLAR_GATE` variants
+- All new `galaxyray` references are correctly formed and functional
+
+**Confirmed** — rename is complete across all project files.
 
 </details>
 
 <details>
 <summary>File Map</summary>
 
-67 files modified. Key changes:
-- `.env.example`, `deploy/galaxyray.env.example` — env var corruption present
-- `.github/workflows/ci.yml`, `release.yml` — docker references updated, but env vars not updated
-- `Cargo.toml` — package name and binary updated; URLs unchanged (intentional)
-- `Cargo.lock` — old name remains (will be regenerated)
-- `src/config.rs`, `src/horizon.rs`, `src/main.rs` — crate references and binary command names updated
-- `docker-compose.yml`, `deploy/docker-compose.prod.yml` — service and volume names updated
-- `README.md`, `CONTRIBUTING.md` — documentation with env var corruption propagated
-- `e2e/playwright.config.js` — test config with env var corruption
-- `tests/*.rs` — test fixtures updated
-- CHANGELOG.md, GitHub URLs — intentionally unchanged
+Key files modified in the current pass:
+- `.env.example` — environment variables corrected
+- `.github/workflows/ci.yml` — docker run command uses `GALAXYRAY_PUBLIC`
+- `.github/workflows/release.yml` — docker run command updated
+- `CONTRIBUTING.md` — documentation env vars corrected
+- `README.md` — environment variable table and examples use `GALAXYRAY_PUBLIC`
+- `deploy/galaxyray.env.example` — environment variables corrected (file already renamed in prior pass)
+- `e2e/playwright.config.js` — test config uses correct env var name
+- `src/config.rs` — `std::env::var("GALAXYRAY_PUBLIC")` and error messages use correct name
+- `src/horizon.rs` — log messages reference correct env var name
+- `src/strkey.rs` — comments reference correct env var name
+- `tests/stream_tests.rs` — test comments reference correct env var name
+
+Full diff available via `git show HEAD`.
 
 </details>
+

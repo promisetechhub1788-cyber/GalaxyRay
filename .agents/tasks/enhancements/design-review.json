@@ -1,0 +1,83 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "severity": "HIGH",
+      "issue": "AppError struct does not have a `forbidden()` method. The design spec calls for `AppError::forbidden(\"forbidden_merchant\", \"merchant ID mismatch\")` in the validate_merchant_path_id middleware, but the existing AppError implementation only provides `bad_request()`, `unsupported_media_type()`, and `not_found()` methods. A `forbidden()` method returning StatusCode::FORBIDDEN (403) must be added to AppError.",
+      "location": "Design: Architecture Overview → Auth Model section (calls to AppError::forbidden). Code: src/api/payments.rs:24 (AppError impl). Middleware code needs to be written."
+    },
+    {
+      "severity": "HIGH",
+      "issue": "Invoice payment linking SQL references wrong table. The design's try_link_invoice_to_payment() function queries 'SELECT paid_amount FROM payments WHERE payment_id IN (...)' but the payments table has no 'paid_amount' column corresponding to individual payments in that query context. The query should sum CAST(payments.amount AS REAL) and compare against invoice.total_amount, not reference a per-payment paid_amount. Additionally, the schema assumes a one-to-many invoice→payments relationship but the design says 'one invoice tracks multiple payment attempts' without clearly specifying whether each payment intent is a separate attempt or if a single payment can be split.",
+      "location": "Feature 2: Integration with Payment Intents section, update_invoice_paid_amount() function. Code: src/db.rs:68-88 (payments table schema has no paid_amount column per payment)."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Email configuration validation incomplete. The design states SMTP env vars must be 'all set or all unset', but the provided SmtpConfig::from_env() pseudocode does not validate that all five vars are actually present if any is present. It checks whether each var is Some/None but does not ensure atomicity: the check `any_set && !all_set.iter().all(|&x| x)` only catches partial sets, but `all_set.iter().all(|&x| x)` will panic or fail if not all vars are present. The error message is clear but implementation must validate exactly that all five are set together.",
+      "location": "Feature 2: Email Configuration section. Code snippet in design provided but not yet implemented."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Analytics cache bypass parameter name differs from implementation intent. The design uses `nocache` as a query parameter name (e.g., `?nocache=1`) and accepts 'any truthy value', but what constitutes 'truthy' is ambiguous for query strings (is `?nocache=false` truthy? is `?nocache=` truthy?). The design should clarify: treat any non-empty string as truthy (e.g., `?nocache=1`, `?nocache=true`, `?nocache=anything`), or accept only specific strings. Recommend: 'if nocache query parameter is present and non-empty'.",
+      "location": "Feature 1: Analytics Dashboard → API Design → Query params section. All analytics endpoints: summary, revenue, conversion, failure-reasons, top-assets, settlement-velocity, retention."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Subscription memo format lacks specification for consistency with Stellar's 28-byte text memo limit. The design specifies memo format as `SUB-{subscription_id}#{charge_count}` but does not confirm that subscription IDs (returned by uuid::Uuid::new_v4().to_string(), which is 36 characters) will fit in 28 bytes. With a 4-char prefix and separators, the memo will exceed 28 bytes in most cases. The design validates at charge creation time and returns `400 Bad Request` / `memo_too_long`, but this is a design-level constraint that should be front-loaded: either use shorter IDs, a different memo format, or document that charge creation will fail for subscriptions with long IDs.",
+      "location": "Feature 3: Subscription/Recurring Billing → Implementation → charge_scheduler_task → create_subscription_charge() function. Memo format: `SUB-{subscription_id}#{charge_count}`."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Subscription overpaid status semantics undefined. The design specifies invoice statuses (draft, unpaid, partially_paid, overpaid, paid) but does not define whether a payment that exceeds the subscription amount in a single charge creates an 'overpaid' subscription status, or whether subscriptions only ever have status 'active', 'paused', 'cancelled', or 'expired'. The invoice overpaid case is clear: paid_amount > total_amount. For subscriptions, is overpayment per-charge (a single charge payment > subscription.amount) or cumulative (total paid > total owed for all future charges)? The design should clarify.",
+      "location": "Feature 3: Subscription/Recurring Billing → API Design → subscription response object. Code includes 'status' field but lacks enum/constraint documentation for overpayment scenarios."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Invoice-payment linking memo matching is fragile. The design links invoices to payments via memo matching (invoice memo = payment memo) at payment creation time. However, if a merchant creates an invoice with memo 'INV-2025-00001', then manually creates a payment with the same memo for unrelated purposes, the linking logic will incorrectly associate them. No atomicity guarantee prevents this race. Recommend either: (a) require an explicit invoice_id parameter in payment creation to opt-in to linking, or (b) document this as a known limitation with operator responsibility to ensure memo uniqueness.",
+      "location": "Feature 2: Integration with Payment Intents → Linking Logic section. Code: try_link_invoice_to_payment() function queries by memo match."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Subscription charge retry backoff calculation may deadlock. The design's retry_failed_charges() function uses a 5-minute grace period between retries (`datetime('now', '-5 minutes')`) but calculates exponential backoff (2^attempts minutes, capped at 60). If a charge fails at T=0, the first retry is scheduled at 2 minutes (backoff), but the grace period is 5 minutes, so the charge won't be retried until T=5. If the second retry also fails, it's scheduled at 4 minutes (2^2), which conflicts with the grace period check. The grace period logic and backoff calculation must be reconciled to avoid confusion.",
+      "location": "Feature 3: Implementation → charge_scheduler.rs → retry_failed_charges() and retry_charge() functions. Grace period: `datetime('now', '-5 minutes')`. Backoff: `2^(attempts-1)` minutes."
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Invoice CSV export pagination deferred but limit of 100,000 rows is not enforced in code. The design states CSV is 'limited to 100,000 rows; return 413 Payload Too Large if exceeded' and calls this out-of-scope for paginated export. However, the design does not specify how the 100K row limit is enforced: is it a LIMIT clause in the SQL query, or do we compute all rows and then check? If rows are computed before checking, the query could consume unbounded memory. Recommend: add explicit LIMIT 100001 to the SQL, then return 413 if row count == 100001.",
+      "location": "Feature 1: Analytics Dashboard → API Design → GET /analytics/export endpoint. Performance Considerations section mentions limit but not enforcement."
+    },
+    {
+      "severity": "NIT",
+      "issue": "Subscription change_frequency action semantics undefined. The design specifies `PATCH /subscriptions/{id}` with `action: change_frequency` but does not define the request body format for specifying the new frequency. Does it include `new_frequency` field in the same request body, or in a separate field? Recommend: clarify that `change_frequency` action requires `new_frequency` in request body (e.g., `{\"action\": \"change_frequency\", \"new_frequency\": \"weekly\"}`).",
+      "location": "Feature 3: API Design → PATCH /v1/merchants/{merchant_id}/subscriptions/{subscription_id}. Request body example missing `new_frequency` field."
+    },
+    {
+      "severity": "NIT",
+      "issue": "Invoice status transition documentation inconsistent with implementation. The design specifies status transitions (draft → unpaid/cancelled, unpaid → partially_paid/overpaid/paid/cancelled, etc.) but the implementation pseudocode in update_invoice_paid_amount() auto-determines status purely from paid_amount vs. total_amount (unpaid if 0, paid if ≥, partially_paid if >0 and <). This means manual PATCH endpoint transitions (e.g., draft → unpaid) cannot override the automatic calculation. Clarify whether manual transitions exist, or if all status changes are computed from payment amounts.",
+      "location": "Feature 2: Invoice Status Transitions section specifies manual transitions; Integration with Payment Intents → update_invoice_paid_amount() auto-computes status; PATCH handler (not yet shown) presumably allows manual overrides."
+    }
+  ],
+  "verifiedAssumptions": [
+    "Bearer token extraction from Authorization header is correctly implemented via auth_middleware in src/api/mod.rs:425.",
+    "Merchant ID is extracted via db::find_merchant_by_key() which queries api_keys table by key_hash, exactly as design assumes.",
+    "api_keys table schema (id, merchant_id, key_hash, prefix, label, created_at, last_used_at, revoked_at) exists and is used for all authentication, per src/db.rs:274.",
+    "payments table exists with columns: id, merchant_id, destination_address, memo, amount, asset, asset_issuer, status, webhook_url, tx_hash, paid_amount (but paid_amount is payment-level aggregate, not per-intent), created_at, updated_at, expires_at. Indexes: memo, status, created_at DESC, (status, expires_at) partial.",
+    "webhook_deliveries table exists for webhook delivery tracking, as designed.",
+    "AuthenticatedMerchant extension type is available and used throughout payments API.",
+    "AppError type exists and supports JSON responses with error code and message.",
+    "TaskHealth struct exists for background job supervision, as assumed in architecture overview.",
+    "SQLite WAL mode and foreign keys are enforced by default in connection options per src/db.rs:19.",
+    "Existing webhook module provides dispatch() and signing logic, as design assumes."
+  ],
+  "unverifiedAssumptions": [
+    "No `forbidden()` method exists on AppError; design assumes it does but implementation must add it.",
+    "No invoice, invoice_line_items, invoice_payments, invoice_email_logs, subscription, or subscription_charges tables exist yet; these are new.",
+    "No analytics module exists; must be created.",
+    "No subscription module exists; must be created.",
+    "Background job scheduler framework exists but subscription charge_scheduler_task is not yet implemented.",
+    "SMTP configuration and email sending library (lettre) are not yet integrated.",
+    "QR code generation library (qrcode) and PDF generation library (printpdf) are not yet added as dependencies.",
+    "Invoice number generation counter and atomicity mechanism not yet implemented."
+  ],
+  "reviewDoc": "c:/Users/LENOVO PC/Desktop/New folder (8)/GalaxyRay/.agents/tasks/enhancements/design.md"
+}
