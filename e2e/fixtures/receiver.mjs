@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /* A local webhook receiver for the end-to-end suite.
  *
  * A redelivery test that only checks the dashboard's own bookkeeping proves
@@ -78,7 +78,7 @@ export async function startReceiver() {
  * Verify the HMAC-SHA256 signature the gateway attaches to every delivery.
  *
  * The signature is a bare hex digest over `"{timestamp}.{body}"`, with the
- * timestamp carried in its own `X-StellarGate-Timestamp` header — not a
+ * timestamp carried in its own `X-GalaxyRay-Timestamp` header — not a
  * comma-delimited `t=…,v1=…` value as in the Stripe-style scheme. Matches
  * `webhook::sign` in src/webhook.rs.
  */
@@ -86,8 +86,8 @@ function verifySignature(headers, body) {
   // Node hands headers over as `string | string[]`; a duplicated header is not
   // something this server produces, so anything but a string is a failure
   // rather than something to coerce.
-  const signature = headers["x-stellargate-signature"];
-  const timestamp = headers["x-stellargate-timestamp"];
+  const signature = headers["x-GalaxyRay-signature"];
+  const timestamp = headers["x-GalaxyRay-timestamp"];
   if (typeof signature !== "string" || typeof timestamp !== "string") return false;
   if (!/^[0-9a-f]{64}$/.test(signature)) return false;
 

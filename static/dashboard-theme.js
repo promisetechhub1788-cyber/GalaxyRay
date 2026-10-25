@@ -1,4 +1,4 @@
-/* StellarGate dashboard - theme bootstrap.
+﻿/* GalaxyRay dashboard - theme bootstrap.
  *
  * A classic (non-module, non-deferred) script in <head>, so it runs before the
  * first paint. That is the whole point of it being separate from app.js: a
@@ -47,7 +47,7 @@
 (function () {
   "use strict";
 
-  var KEY = "stellargate.theme";
+  var KEY = "GalaxyRay.theme";
   var root = document.documentElement;
 
   /**

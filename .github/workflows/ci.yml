@@ -113,7 +113,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Catches Dockerfile/compose port or healthcheck drift, and a real
-      # secret slipping into deploy/stellargate.env.example, before it merges
+      # secret slipping into deploy/galaxyray.env.example, before it merges
       # rather than at deploy time (issues #444, #447).
       - name: Check deploy assets against Dockerfile
         run: bash scripts/check-deploy-consistency.sh
@@ -134,7 +134,7 @@ jobs:
         with:
           context: .
           load: true
-          tags: stellargate:ci
+          tags: galaxyray:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -148,7 +148,7 @@ jobs:
           docker run -d --name sg -p 3000:3000 \
             -e STELLAR_GATEWAY_PUBLIC=UNCONFIGURED \
             -e WEBHOOK_SECRET=$(openssl rand -hex 32) \
-            stellargate:ci
+            galaxyray:ci
           for i in $(seq 1 30); do
             s=$(docker inspect -f '{{.State.Health.Status}}' sg)
             [ "$s" = healthy ] && exit 0

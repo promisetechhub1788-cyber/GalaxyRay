@@ -1,4 +1,4 @@
-//! Expiry sweeper: retiring pending payment intents that were never paid.
+﻿//! Expiry sweeper: retiring pending payment intents that were never paid.
 //!
 //! Every intent is created with an `expires_at` timestamp (`created_at +
 //! PAYMENT_TTL_SECS`). A background task periodically transitions any `pending`
@@ -7,7 +7,7 @@
 //! and merchants get a definite signal that the intent will never settle.
 //!
 //! Expiry is purely time- and database-driven, so the sweeper runs even when no
-//! Stellar gateway is configured (unlike the Horizon poller).
+//! Galaxy Rayway is configured (unlike the Horizon poller).
 
 use crate::{AppState, db, webhook};
 use std::sync::Arc;
@@ -192,7 +192,7 @@ mod tests {
         assert_eq!(received.len(), 1, "exactly one webhook POST must be sent");
         let req = &received[0];
         assert_eq!(
-            req.headers.get("X-StellarGate-Event").unwrap(),
+            req.headers.get("X-GalaxyRay-Event").unwrap(),
             EXPIRED_EVENT
         );
 
@@ -205,7 +205,7 @@ mod tests {
         // The signature is valid over the body the mock server actually received.
         let timestamp: i64 = req
             .headers
-            .get("X-StellarGate-Timestamp")
+            .get("X-GalaxyRay-Timestamp")
             .expect("expiry webhook should include a timestamp header")
             .to_str()
             .unwrap()
@@ -213,7 +213,7 @@ mod tests {
             .expect("timestamp header should be an integer");
         let signature = req
             .headers
-            .get("X-StellarGate-Signature")
+            .get("X-GalaxyRay-Signature")
             .expect("expiry webhook should include a signature header")
             .to_str()
             .unwrap();

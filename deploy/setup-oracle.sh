@@ -1,19 +1,19 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 #
-# Bootstrap an Oracle Cloud "Always Free" VM to run StellarGate.
+# Bootstrap an Oracle Cloud "Always Free" VM to run GalaxyRay.
 # Idempotent — safe to re-run.
 #
-#   curl -fsSL https://raw.githubusercontent.com/StellarGateLabs/StellarGate/main/deploy/setup-oracle.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/GalaxyRayLabs/GalaxyRay/main/deploy/setup-oracle.sh | bash
 #   # or, from a clone:  bash deploy/setup-oracle.sh
 #
 # Installs Docker, opens the host firewall, and installs a systemd unit so the
 # stack comes back after a reboot. It does NOT start the app — you still need
-# to write deploy/stellargate.env and point DNS at this host first.
+# to write deploy/GalaxyRay.env and point DNS at this host first.
 
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/StellarGateLabs/StellarGate.git}"
-APP_DIR="${APP_DIR:-$HOME/StellarGate}"
+REPO_URL="${REPO_URL:-https://github.com/GalaxyRayLabs/GalaxyRay.git}"
+APP_DIR="${APP_DIR:-$HOME/GalaxyRay}"
 
 log() { printf '\n\033[1;34m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m warning:\033[0m %s\n' "$*"; }
@@ -103,9 +103,9 @@ fi
 
 # ── systemd unit ──────────────────────────────────────────────────────────
 log "Installing systemd unit"
-sudo tee /etc/systemd/system/stellargate.service >/dev/null <<UNIT
+sudo tee /etc/systemd/system/GalaxyRay.service >/dev/null <<UNIT
 [Unit]
-Description=StellarGate payment gateway
+Description=GalaxyRay payment gateway
 Requires=docker.service
 After=docker.service network-online.target
 Wants=network-online.target
@@ -114,8 +114,8 @@ Wants=network-online.target
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=${APP_DIR}
-ExecStart=/usr/bin/docker compose --env-file deploy/stellargate.env -f deploy/docker-compose.prod.yml up -d --pull always
-ExecStop=/usr/bin/docker compose --env-file deploy/stellargate.env -f deploy/docker-compose.prod.yml down
+ExecStart=/usr/bin/docker compose --env-file deploy/GalaxyRay.env -f deploy/docker-compose.prod.yml up -d --pull always
+ExecStop=/usr/bin/docker compose --env-file deploy/GalaxyRay.env -f deploy/docker-compose.prod.yml down
 TimeoutStartSec=0
 User=${USER}
 Group=docker
@@ -125,30 +125,30 @@ WantedBy=multi-user.target
 UNIT
 
 sudo systemctl daemon-reload
-sudo systemctl enable stellargate.service >/dev/null
+sudo systemctl enable GalaxyRay.service >/dev/null
 log "systemd unit installed and enabled (not started)"
 
 cat <<EOF
 
   Next:
 
-    1. cp $APP_DIR/deploy/stellargate.env.example $APP_DIR/deploy/stellargate.env
-       chmod 600 $APP_DIR/deploy/stellargate.env
-       \$EDITOR $APP_DIR/deploy/stellargate.env
+    1. cp $APP_DIR/deploy/GalaxyRay.env.example $APP_DIR/deploy/GalaxyRay.env
+       chmod 600 $APP_DIR/deploy/GalaxyRay.env
+       \$EDITOR $APP_DIR/deploy/GalaxyRay.env
 
        Generate both secrets with:  openssl rand -hex 32
-       Set STELLARGATE_VERSION to a released tag from:
-         https://github.com/StellarGateLabs/StellarGate/releases
+       Set GalaxyRay_VERSION to a released tag from:
+         https://github.com/GalaxyRayLabs/GalaxyRay/releases
 
     2. Point your domain's A record at this host:
          $(curl -fsS --max-time 5 https://api.ipify.org 2>/dev/null || echo "<this VM's public IP>")
        Caddy cannot issue a certificate until DNS resolves here.
 
-    3. sudo systemctl start stellargate
+    3. sudo systemctl start GalaxyRay
 
     4. curl https://<your-domain>/health
 
-  Logs:    docker compose --env-file deploy/stellargate.env -f deploy/docker-compose.prod.yml logs -f
-  Status:  systemctl status stellargate
+  Logs:    docker compose --env-file deploy/GalaxyRay.env -f deploy/docker-compose.prod.yml logs -f
+  Status:  systemctl status GalaxyRay
 
 EOF

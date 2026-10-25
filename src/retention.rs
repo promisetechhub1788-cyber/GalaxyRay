@@ -1,4 +1,4 @@
-//! Retention worker.
+﻿//! Retention worker.
 //!
 //! Two tables grow monotonically with traffic and have no natural bound:
 //! `idempotency_keys` gains a row per guarded create, and `webhook_deliveries`

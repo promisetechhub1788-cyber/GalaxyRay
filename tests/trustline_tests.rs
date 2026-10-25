@@ -1,4 +1,4 @@
-//! Startup trustline check (issue #116).
+﻿//! Startup trustline check (issue #116).
 //!
 //! `horizon::check_trustlines` queries Horizon for the gateway account's
 //! balances and surfaces any accepted asset the account has no trustline for —
@@ -9,7 +9,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use stellargate::{
+use galaxyray::{
     AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db, horizon,
@@ -83,13 +83,13 @@ async fn make_state(horizon_url: String) -> Arc<AppState> {
         },
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     })
 }
 
@@ -253,7 +253,7 @@ async fn run_trustline_checker_disabled_without_a_gateway() {
     let exit = horizon::run_trustline_checker(state_arc, rx).await;
     assert!(matches!(
         exit,
-        stellargate::supervise::TaskExit::DisabledByConfig(_)
+        galaxyray::supervise::TaskExit::DisabledByConfig(_)
     ));
 }
 
@@ -289,7 +289,7 @@ async fn run_trustline_checker_refreshes_state_on_its_interval() {
         .unwrap();
     assert!(matches!(
         exit,
-        stellargate::supervise::TaskExit::ShutdownRequested
+        galaxyray::supervise::TaskExit::ShutdownRequested
     ));
 
     assert_eq!(

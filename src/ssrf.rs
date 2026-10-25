@@ -1,4 +1,4 @@
-//! Guards outbound webhook requests against SSRF.
+﻿//! Guards outbound webhook requests against SSRF.
 //!
 //! `webhook_url` is merchant-supplied and reachable by an unauthenticated caller
 //! via the redeliver endpoint, so before every dispatch we resolve the target
@@ -76,7 +76,7 @@ pub fn pinned_client(target: &SafeTarget, timeout: Duration) -> reqwest::Result<
         // Redirects must be rejected rather than followed: the destination
         // of a redirect has not passed the SSRF validation and pinning above.
         .redirect(reqwest::redirect::Policy::none())
-        .user_agent(concat!("StellarGate/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("GalaxyRay/", env!("CARGO_PKG_VERSION")))
         .resolve(&target.host, target.addr)
         .build()
 }

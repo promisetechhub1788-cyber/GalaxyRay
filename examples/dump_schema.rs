@@ -1,6 +1,6 @@
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+﻿use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
-use stellargate::db;
+use galaxyray::db;
 
 #[tokio::main]
 async fn main() {

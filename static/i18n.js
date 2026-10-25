@@ -1,4 +1,4 @@
-/* StellarGate dashboard message catalog.
+﻿/* GalaxyRay dashboard message catalog.
  *
  * Flat key -> string maps, one per locale. `en` is the source of truth: a key
  * missing from another locale falls back to it. Strings are always written
@@ -14,12 +14,12 @@
 (function () {
   "use strict";
 
-  var LOCALE_KEY = "stellargate.locale";
+  var LOCALE_KEY = "GalaxyRay.locale";
   var RTL = ["ar", "fa", "he", "ur"];
 
   var catalogs = {
     en: {
-      "app.title": "StellarGate Dashboard",
+      "app.title": "GalaxyRay Dashboard",
       "gate.intro": "Sign in with a merchant API key to view payments.",
       "gate.apiKey": "API key",
       "gate.apiKeyPlaceholder": "merchant API key",
@@ -69,7 +69,7 @@
       "error.restore": "Could not restore your session: {message}",
     },
     es: {
-      "app.title": "Panel de StellarGate",
+      "app.title": "Panel de GalaxyRay",
       "gate.intro": "Inicia sesión con una clave API de comerciante para ver los pagos.",
       "gate.apiKey": "Clave API",
       "gate.apiKeyPlaceholder": "clave API de comerciante",

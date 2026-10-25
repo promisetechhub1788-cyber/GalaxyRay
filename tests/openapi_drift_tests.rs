@@ -1,4 +1,4 @@
-//! Locks `openapi.yaml`'s `CreatePaymentRequest` schema to the Rust struct of
+﻿//! Locks `openapi.yaml`'s `CreatePaymentRequest` schema to the Rust struct of
 //! the same name (`src/api/payments.rs`), so the two cannot silently drift
 //! apart again the way they did for `merchant_id` (issue #307): a client
 //! generated from the spec would have exposed a settable field the server

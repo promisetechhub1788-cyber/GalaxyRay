@@ -1,4 +1,4 @@
-// API client for the StellarGate dashboard.
+﻿// API client for the GalaxyRay dashboard.
 //
 // Every request goes through `request()`, which owns the fetch call, the
 // bearer auth header and the error handling. The API key is only ever sent

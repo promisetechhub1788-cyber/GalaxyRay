@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 #
 # Cross-checks the deploy assets against each other and against Dockerfile so
 # they cannot silently drift apart as the app evolves (issues #444, #447):
@@ -7,7 +7,7 @@
 #     the app on.
 #   - The healthcheck binary path baked into the runtime image matches what
 #     every compose file's healthcheck actually invokes.
-#   - deploy/stellargate.env.example never carries a real-looking secret in
+#   - deploy/GalaxyRay.env.example never carries a real-looking secret in
 #     place of a placeholder.
 #   - Every path named in the README architecture tree actually exists, and no
 #     document claims a `migrations/` directory exists (issue #868).

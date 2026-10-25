@@ -1,4 +1,4 @@
-//! Horizon poller throttling behavior (issue #313).
+﻿//! Horizon poller throttling behavior (issue #313).
 //!
 //! `horizon::fetch_recent_payments` used to turn every non-2xx Horizon
 //! response into an opaque `reqwest::Error` via `error_for_status()`,
@@ -12,7 +12,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use stellargate::{
+use galaxyray::{
     AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db, horizon,
@@ -86,13 +86,13 @@ async fn make_state(horizon_url: String) -> Arc<AppState> {
         },
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     })
 }
 

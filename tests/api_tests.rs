@@ -1,10 +1,10 @@
-use axum::http::StatusCode;
+﻿use axum::http::StatusCode;
 use axum_test::TestServer;
 use serde_json::{Value, json};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use stellargate::{
+use galaxyray::{
     AppState, api,
     config::{Config, ListenerMode},
     db,
@@ -18,7 +18,7 @@ fn make_config() -> Config {
         network: "testnet".into(),
         horizon_url: String::new(),
         gateway_public: "UNCONFIGURED".into(),
-        accepted_assets: stellargate::config::AcceptedAsset::default_list(),
+        accepted_assets: galaxyray::config::AcceptedAsset::default_list(),
         webhook_secret: String::new(),
         webhook_retry_attempts: 1,
         webhook_retry_delay_ms: 0,
@@ -82,13 +82,13 @@ async fn server_with_config(cfg: Config) -> (TestServer, db::Db) {
         config: cfg,
         http,
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     let server = TestServer::new(router);
@@ -96,11 +96,11 @@ async fn server_with_config(cfg: Config) -> (TestServer, db::Db) {
 }
 
 /// Like [`server_with_config`], but wires a caller-supplied
-/// [`stellargate::metrics::TrustlineMetrics`] instead of a fresh one, so a
+/// [`galaxyray::metrics::TrustlineMetrics`] instead of a fresh one, so a
 /// test can pre-seed the trustline-check state `POST /payments` reads from.
 async fn server_with_config_and_trustlines(
     cfg: Config,
-    trustlines: stellargate::metrics::TrustlineMetrics,
+    trustlines: galaxyray::metrics::TrustlineMetrics,
 ) -> (TestServer, db::Db) {
     let pool = SqlitePoolOptions::new()
         .connect_with(
@@ -117,13 +117,13 @@ async fn server_with_config_and_trustlines(
         config: cfg,
         http,
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
         trustline_metrics: trustlines,
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     let server = TestServer::new(router);
@@ -241,18 +241,18 @@ async fn test_auth_outcomes_are_counted_in_metrics() {
     res.assert_status_ok();
     let body = res.text();
     assert!(
-        body.contains("stellargate_auth_attempts_total{outcome=\"success\"} 1"),
+        body.contains("GalaxyRay_auth_attempts_total{outcome=\"success\"} 1"),
         "got: {body}"
     );
     assert!(
         body.contains(
-            "stellargate_auth_attempts_total{outcome=\"failure\",reason=\"missing_key\"} 1"
+            "GalaxyRay_auth_attempts_total{outcome=\"failure\",reason=\"missing_key\"} 1"
         ),
         "got: {body}"
     );
     assert!(
         body.contains(
-            "stellargate_auth_attempts_total{outcome=\"failure\",reason=\"invalid_key\"} 1"
+            "GalaxyRay_auth_attempts_total{outcome=\"failure\",reason=\"invalid_key\"} 1"
         ),
         "got: {body}"
     );
@@ -483,7 +483,7 @@ async fn test_create_invalid_asset() {
 
 #[tokio::test]
 async fn test_create_rejects_asset_with_confirmed_missing_trustline() {
-    let trustlines = stellargate::metrics::TrustlineMetrics::new();
+    let trustlines = galaxyray::metrics::TrustlineMetrics::new();
     trustlines.record_check_full(["USDC"], &["USDC".to_string()], &[], &[]);
     let (server, _pool) = server_with_config_and_trustlines(make_config(), trustlines).await;
     let key = provision_merchant(&server).await;
@@ -497,7 +497,7 @@ async fn test_create_rejects_asset_with_confirmed_missing_trustline() {
 
 #[tokio::test]
 async fn test_create_accepts_asset_with_confirmed_present_trustline() {
-    let trustlines = stellargate::metrics::TrustlineMetrics::new();
+    let trustlines = galaxyray::metrics::TrustlineMetrics::new();
     trustlines.record_check_full(["USDC"], &[], &[], &[]);
     let (server, _pool) = server_with_config_and_trustlines(make_config(), trustlines).await;
     let key = provision_merchant(&server).await;
@@ -513,7 +513,7 @@ async fn test_create_accepts_asset_with_confirmed_present_trustline() {
 /// somehow marked missing.
 #[tokio::test]
 async fn test_create_never_rejects_native_xlm_for_a_missing_trustline() {
-    let trustlines = stellargate::metrics::TrustlineMetrics::new();
+    let trustlines = galaxyray::metrics::TrustlineMetrics::new();
     trustlines.record_check_full(["USDC"], &["USDC".to_string()], &[], &[]);
     let (server, _pool) = server_with_config_and_trustlines(make_config(), trustlines).await;
     let key = provision_merchant(&server).await;
@@ -549,7 +549,7 @@ async fn test_create_never_rejects_native_xlm_for_a_missing_trustline() {
 
 #[tokio::test]
 async fn test_metrics_expose_trustline_state() {
-    let trustlines = stellargate::metrics::TrustlineMetrics::new();
+    let trustlines = galaxyray::metrics::TrustlineMetrics::new();
     trustlines.record_check_full(["USDC", "EURC"], &["USDC".to_string()], &[], &[]);
     trustlines.record_check_failure();
     let (server, _pool) = server_with_config_and_trustlines(make_config(), trustlines).await;
@@ -560,19 +560,19 @@ async fn test_metrics_expose_trustline_state() {
         .await
         .text();
     assert!(
-        body.contains("stellargate_missing_trustlines{asset=\"USDC\"} 1"),
+        body.contains("GalaxyRay_missing_trustlines{asset=\"USDC\"} 1"),
         "got: {body}"
     );
     assert!(
-        body.contains("stellargate_missing_trustlines{asset=\"EURC\"} 0"),
+        body.contains("GalaxyRay_missing_trustlines{asset=\"EURC\"} 0"),
         "got: {body}"
     );
     assert!(
-        body.contains("stellargate_trustline_check_failures_total 1"),
+        body.contains("GalaxyRay_trustline_check_failures_total 1"),
         "got: {body}"
     );
     assert!(
-        body.contains("stellargate_trustline_check_last_success_timestamp_seconds"),
+        body.contains("GalaxyRay_trustline_check_last_success_timestamp_seconds"),
         "got: {body}"
     );
 }
@@ -749,7 +749,7 @@ async fn test_redeliver_rejects_ssrf_target_even_for_a_stored_delivery() {
         .unwrap()
         .to_string();
 
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-ssrf",
         &id,
@@ -840,7 +840,7 @@ async fn test_list_filters_by_underpaid_status() {
     }
 
     // Mirror what horizon::settle does for a short payment.
-    stellargate::db::update_payment_status(&pool, &ids[0], "underpaid", "TX_PARTIAL", "3")
+    galaxyray::db::update_payment_status(&pool, &ids[0], "underpaid", "TX_PARTIAL", "3")
         .await
         .unwrap();
 
@@ -905,7 +905,7 @@ async fn test_filterable_statuses_match_producible_statuses() {
             .unwrap()
             .to_string();
         if status != "pending" {
-            stellargate::db::update_payment_status(&pool, &id, status, "TX", "1")
+            galaxyray::db::update_payment_status(&pool, &id, status, "TX", "1")
                 .await
                 .unwrap();
         }
@@ -1071,7 +1071,7 @@ async fn test_list_webhooks_rejects_other_merchants_payment() {
         .unwrap()
         .to_string();
 
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-owned",
         &id,
@@ -1152,7 +1152,7 @@ async fn test_redeliver_rejects_other_merchants_payment() {
         .unwrap()
         .to_string();
 
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-owned",
         &id,
@@ -1174,7 +1174,7 @@ async fn test_redeliver_rejects_other_merchants_payment() {
 
 /// A redelivered webhook must carry the event the payload actually describes.
 /// Hard-coding `payment.completed` here would tell a receiver that routes on
-/// `X-StellarGate-Event` the opposite of what the body says.
+/// `X-GalaxyRay-Event` the opposite of what the body says.
 #[tokio::test]
 async fn test_redeliver_echoes_the_original_event_type() {
     let mock = wiremock::MockServer::start().await;
@@ -1200,7 +1200,7 @@ async fn test_redeliver_echoes_the_original_event_type() {
         .unwrap()
         .to_string();
 
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-underpaid",
         &id,
@@ -1222,7 +1222,7 @@ async fn test_redeliver_echoes_the_original_event_type() {
     let received = mock.received_requests().await.unwrap();
     assert_eq!(received.len(), 1);
     assert_eq!(
-        received[0].headers.get("X-StellarGate-Event").unwrap(),
+        received[0].headers.get("X-GalaxyRay-Event").unwrap(),
         "payment.underpaid",
         "redelivered header must match the event the payload carries"
     );
@@ -1276,7 +1276,7 @@ async fn test_redeliver_falls_back_to_payload_event_for_legacy_rows() {
 
     let received = mock.received_requests().await.unwrap();
     assert_eq!(
-        received[0].headers.get("X-StellarGate-Event").unwrap(),
+        received[0].headers.get("X-GalaxyRay-Event").unwrap(),
         "payment.overpaid"
     );
 }
@@ -1309,7 +1309,7 @@ async fn test_webhook_delivery_isolation() {
         .to_string();
 
     // Manually insert a delivery for payment 1
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-1",
         &id1,
@@ -1588,7 +1588,7 @@ async fn test_root_serves_version_to_api_clients() {
         let res = server.get("/").add_header("Accept", accept).await;
         res.assert_status_ok();
         assert!(
-            res.text().starts_with("StellarGate API v"),
+            res.text().starts_with("GalaxyRay API v"),
             "Accept: {accept} should get the version string, got: {}",
             res.text()
         );
@@ -1597,7 +1597,7 @@ async fn test_root_serves_version_to_api_clients() {
     // No Accept header at all (plain curl) must not redirect either.
     let res = server.get("/").await;
     res.assert_status_ok();
-    assert!(res.text().starts_with("StellarGate API v"));
+    assert!(res.text().starts_with("GalaxyRay API v"));
 }
 
 /// Regression guard: the sign-in form must be visible in the markup as shipped.

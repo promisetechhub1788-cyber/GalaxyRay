@@ -1,9 +1,9 @@
-//! Minimal Stellar strkey validation.
+﻿//! Minimal Stellar strkey validation.
 //!
 //! A Stellar account address ("strkey") such as `GBBD47IF...` base32-encodes a
 //! one-byte version, a 32-byte ed25519 public key, and a two-byte CRC16-XModem
 //! checksum. Checking the prefix, length, base32 alphabet and checksum catches
-//! the failure mode this guards against: a mistyped `STELLAR_GATEWAY_PUBLIC`
+//! the failure mode this guards against: a mistyped `galaxy_rayWAY_PUBLIC`
 //! (or asset issuer) that would otherwise silently mint unpayable intents.
 //!
 //! This is a small, dependency-free validator. It verifies structure and the

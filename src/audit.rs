@@ -1,4 +1,4 @@
-//! One-off audit for intents under-credited by the multi-operation bug.
+﻿//! One-off audit for intents under-credited by the multi-operation bug.
 //!
 //! `processed_transactions` is keyed on `(payment_id, tx_hash)`, so a single
 //! transaction carrying several payment operations to the gateway for the same

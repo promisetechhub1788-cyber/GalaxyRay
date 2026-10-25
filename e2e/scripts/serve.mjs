@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /* Launch the gateway for the end-to-end suite.
  *
  * Playwright's `webServer` wants a command and a URL to poll. The server needs
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
-const binary = join(repoRoot, "target", "debug", "stellargate");
+const binary = join(repoRoot, "target", "debug", "GalaxyRay");
 
 if (process.env.MOCK_API === "1") {
   const { startMockApi } = await import("./mock-api.mjs");

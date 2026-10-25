@@ -1,4 +1,4 @@
-//! Money handling for Stellar amounts.
+﻿//! Money handling for Stellar amounts.
 //!
 //! Stellar represents every balance as an integer number of *stroops*, where
 //! `1 unit = 10_000_000 stroops` (7 decimal places). Doing arithmetic and
@@ -17,7 +17,7 @@ pub const MAX_DECIMALS: usize = 7;
 /// carries more than [`MAX_DECIMALS`] decimal places, or overflows `i64`.
 ///
 /// ```
-/// use stellargate::money::parse_stroops;
+/// use galaxyray::money::parse_stroops;
 /// assert_eq!(parse_stroops("1"), Some(10_000_000));
 /// assert_eq!(parse_stroops("0.0000001"), Some(1));
 /// assert_eq!(parse_stroops("10.50"), Some(105_000_000));

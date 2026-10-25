@@ -1,7 +1,7 @@
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+﻿use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::time::Duration;
-use stellargate::db;
+use galaxyray::db;
 
 #[tokio::test]
 async fn migration_rolls_back_schema_changes_when_backfill_fails() {
@@ -337,7 +337,7 @@ async fn deleting_payment_cascades_to_children() {
 /// A throwaway on-disk database URL. WAL needs a real file: an in-memory
 /// database silently keeps `journal_mode = memory` whatever is requested.
 fn temp_db_url() -> (std::path::PathBuf, String) {
-    let dir = std::env::temp_dir().join(format!("stellargate-pool-{}", uuid::Uuid::new_v4()));
+    let dir = std::env::temp_dir().join(format!("GalaxyRay-pool-{}", uuid::Uuid::new_v4()));
     std::fs::create_dir_all(&dir).unwrap();
     let url = format!("sqlite://{}", dir.join("pool.db").display());
     (dir, url)

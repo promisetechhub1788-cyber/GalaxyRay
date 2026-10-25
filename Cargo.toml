@@ -1,5 +1,5 @@
-[package]
-name = "stellargate"
+﻿[package]
+name = "galaxyray"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.94"
@@ -17,7 +17,7 @@ categories = ["web-programming::http-server", "finance"]
 publish = false
 
 [[bin]]
-name = "stellargate"
+name = "galaxyray"
 path = "src/main.rs"
 
 [dependencies]

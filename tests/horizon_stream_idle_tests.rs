@@ -1,4 +1,4 @@
-//! Horizon SSE stream idle-timeout behavior (issue #312).
+﻿//! Horizon SSE stream idle-timeout behavior (issue #312).
 //!
 //! `stream_once` used to await `stream.next()` with nothing bounding it, so a
 //! half-open connection — one that stops delivering bytes without closing,
@@ -21,7 +21,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use stellargate::{
+use galaxyray::{
     AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db, horizon,
@@ -87,13 +87,13 @@ async fn make_state(horizon_url: String, stream_idle_timeout_secs: u64) -> Arc<A
         },
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     })
 }
 
@@ -192,7 +192,7 @@ async fn stalled_stream_is_detected_and_reconnected() {
         "a detected stall must be counted as a stream reconnect"
     );
 
-    let db_snapshot = stellargate::metrics::DbSnapshot {
+    let db_snapshot = galaxyray::metrics::DbSnapshot {
         pool_size: state.pool.size(),
         pool_idle: state.pool.num_idle() as u32,
         pool_max: state.config.db_pool_max_connections,
@@ -200,7 +200,7 @@ async fn stalled_stream_is_detected_and_reconnected() {
         wal_bytes: None,
         shm_bytes: None,
     };
-    let rendered = stellargate::metrics::render(
+    let rendered = galaxyray::metrics::render(
         &state.webhook_metrics,
         &state.auth_metrics,
         &state.task_health,
@@ -211,7 +211,7 @@ async fn stalled_stream_is_detected_and_reconnected() {
         &state.trustline_metrics,
     );
     assert!(
-        rendered.contains("stellargate_horizon_stream_reconnects_total"),
+        rendered.contains("GalaxyRay_horizon_stream_reconnects_total"),
         "the reconnect counter must be exported on /metrics:\n{rendered}"
     );
 

@@ -1,5 +1,5 @@
 name: Feature request
-description: Propose a capability StellarGate does not have yet.
+description: Propose a capability GalaxyRay does not have yet.
 labels: ["enhancement"]
 body:
   - type: textarea

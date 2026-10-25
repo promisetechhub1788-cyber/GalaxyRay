@@ -1,4 +1,4 @@
-//! Integration tests for the Horizon SSE stream listener.
+﻿//! Integration tests for the Horizon SSE stream listener.
 //!
 //! Covers `stream_once`, `handle_stream_event`, and `run_stream_listener`
 //! using a wiremock server that returns `text/event-stream` responses.
@@ -16,7 +16,7 @@ use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
-use stellargate::{
+use galaxyray::{
     AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db, horizon,
@@ -90,13 +90,13 @@ async fn setup_state(horizon_url: &str) -> Arc<AppState> {
         config: cfg,
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     })
 }
 
@@ -475,7 +475,7 @@ async fn shutdown_causes_prompt_exit() {
 }
 
 /// `run_stream_listener` returns `TaskExit::DisabledByConfig` immediately when
-/// `STELLAR_GATEWAY_PUBLIC` is not set, without connecting to Horizon at all.
+/// `galaxy_rayWAY_PUBLIC` is not set, without connecting to Horizon at all.
 #[tokio::test]
 async fn unconfigured_gateway_exits_disabled_by_config() {
     let server = MockServer::start().await;
@@ -496,13 +496,13 @@ async fn unconfigured_gateway_exits_disabled_by_config() {
         config: cfg,
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     });
 
     let (_tx, rx) = tokio::sync::watch::channel(false);

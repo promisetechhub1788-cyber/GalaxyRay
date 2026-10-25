@@ -1,4 +1,4 @@
-//! In-process metrics: atomic counters and a latency histogram for webhook
+﻿//! In-process metrics: atomic counters and a latency histogram for webhook
 //! delivery outcomes.
 //!
 //! All types are cheaply clonable (backed by `Arc`-wrapped atomics) so they
@@ -812,133 +812,133 @@ pub fn render(
 ) -> String {
     let mut out = String::with_capacity(4096);
 
-    // stellargate_webhook_deliveries_total — counter vec by outcome
+    // GalaxyRay_webhook_deliveries_total — counter vec by outcome
     out.push_str(
-        "# HELP stellargate_webhook_deliveries_total Total webhook delivery attempts by outcome.\n",
+        "# HELP GalaxyRay_webhook_deliveries_total Total webhook delivery attempts by outcome.\n",
     );
-    out.push_str("# TYPE stellargate_webhook_deliveries_total counter\n");
+    out.push_str("# TYPE GalaxyRay_webhook_deliveries_total counter\n");
     out.push_str(&format!(
-        "stellargate_webhook_deliveries_total{{outcome=\"delivered\"}} {}\n",
+        "GalaxyRay_webhook_deliveries_total{{outcome=\"delivered\"}} {}\n",
         webhook.delivered()
     ));
     out.push_str(&format!(
-        "stellargate_webhook_deliveries_total{{outcome=\"failed\"}} {}\n",
+        "GalaxyRay_webhook_deliveries_total{{outcome=\"failed\"}} {}\n",
         webhook.failed()
     ));
 
-    // stellargate_webhook_retries_total — counter
-    out.push_str("# HELP stellargate_webhook_retries_total Total webhook retry attempts (excludes the first try).\n");
-    out.push_str("# TYPE stellargate_webhook_retries_total counter\n");
+    // GalaxyRay_webhook_retries_total — counter
+    out.push_str("# HELP GalaxyRay_webhook_retries_total Total webhook retry attempts (excludes the first try).\n");
+    out.push_str("# TYPE GalaxyRay_webhook_retries_total counter\n");
     out.push_str(&format!(
-        "stellargate_webhook_retries_total {}\n",
+        "GalaxyRay_webhook_retries_total {}\n",
         webhook.retried()
     ));
 
-    // stellargate_webhook_delivery_latency_ms — histogram
-    out.push_str("# HELP stellargate_webhook_delivery_latency_ms End-to-end webhook delivery latency in milliseconds.\n");
-    out.push_str("# TYPE stellargate_webhook_delivery_latency_ms histogram\n");
+    // GalaxyRay_webhook_delivery_latency_ms — histogram
+    out.push_str("# HELP GalaxyRay_webhook_delivery_latency_ms End-to-end webhook delivery latency in milliseconds.\n");
+    out.push_str("# TYPE GalaxyRay_webhook_delivery_latency_ms histogram\n");
     for (i, &bound) in LATENCY_BUCKETS_MS.iter().enumerate() {
         out.push_str(&format!(
-            "stellargate_webhook_delivery_latency_ms_bucket{{le=\"{}\"}} {}\n",
+            "GalaxyRay_webhook_delivery_latency_ms_bucket{{le=\"{}\"}} {}\n",
             bound,
             webhook.latency_bucket(i)
         ));
     }
     out.push_str(&format!(
-        "stellargate_webhook_delivery_latency_ms_bucket{{le=\"+Inf\"}} {}\n",
+        "GalaxyRay_webhook_delivery_latency_ms_bucket{{le=\"+Inf\"}} {}\n",
         webhook.latency_bucket(LATENCY_BUCKETS_MS.len())
     ));
     out.push_str(&format!(
-        "stellargate_webhook_delivery_latency_ms_sum {}\n",
+        "GalaxyRay_webhook_delivery_latency_ms_sum {}\n",
         webhook.latency_sum_ms()
     ));
     out.push_str(&format!(
-        "stellargate_webhook_delivery_latency_ms_count {}\n",
+        "GalaxyRay_webhook_delivery_latency_ms_count {}\n",
         webhook.latency_count()
     ));
 
-    // stellargate_auth_attempts_total — counter vec by outcome/reason
+    // GalaxyRay_auth_attempts_total — counter vec by outcome/reason
     out.push_str(
-        "# HELP stellargate_auth_attempts_total Total auth middleware decisions by outcome and reason.\n",
+        "# HELP GalaxyRay_auth_attempts_total Total auth middleware decisions by outcome and reason.\n",
     );
-    out.push_str("# TYPE stellargate_auth_attempts_total counter\n");
+    out.push_str("# TYPE GalaxyRay_auth_attempts_total counter\n");
     out.push_str(&format!(
-        "stellargate_auth_attempts_total{{outcome=\"success\"}} {}\n",
+        "GalaxyRay_auth_attempts_total{{outcome=\"success\"}} {}\n",
         auth.success()
     ));
     out.push_str(&format!(
-        "stellargate_auth_attempts_total{{outcome=\"failure\",reason=\"missing_key\"}} {}\n",
+        "GalaxyRay_auth_attempts_total{{outcome=\"failure\",reason=\"missing_key\"}} {}\n",
         auth.failure_missing_key()
     ));
     out.push_str(&format!(
-        "stellargate_auth_attempts_total{{outcome=\"failure\",reason=\"invalid_key\"}} {}\n",
+        "GalaxyRay_auth_attempts_total{{outcome=\"failure\",reason=\"invalid_key\"}} {}\n",
         auth.failure_invalid_key()
     ));
     out.push_str(&format!(
-        "stellargate_auth_attempts_total{{outcome=\"failure\",reason=\"internal_error\"}} {}\n",
+        "GalaxyRay_auth_attempts_total{{outcome=\"failure\",reason=\"internal_error\"}} {}\n",
         auth.failure_internal_error()
     ));
 
-    // stellargate_horizon_records_skipped_total — counter vec by reason
+    // GalaxyRay_horizon_records_skipped_total — counter vec by reason
     out.push_str(
-        "# HELP stellargate_horizon_records_skipped_total Horizon payment records the reconciler refused to credit, by reason.\n",
+        "# HELP GalaxyRay_horizon_records_skipped_total Horizon payment records the reconciler refused to credit, by reason.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_records_skipped_total counter\n");
+    out.push_str("# TYPE GalaxyRay_horizon_records_skipped_total counter\n");
     out.push_str(&format!(
-        "stellargate_horizon_records_skipped_total{{reason=\"no_tx_hash\"}} {}\n",
+        "GalaxyRay_horizon_records_skipped_total{{reason=\"no_tx_hash\"}} {}\n",
         horizon.unhashed_records_skipped()
     ));
 
-    // stellargate_tasks_* — background task health gauges and counters
+    // GalaxyRay_tasks_* — background task health gauges and counters
     out.push_str(
-        "# HELP stellargate_tasks_started_total Total background task starts (including restarts).\n",
+        "# HELP GalaxyRay_tasks_started_total Total background task starts (including restarts).\n",
     );
-    out.push_str("# TYPE stellargate_tasks_started_total counter\n");
+    out.push_str("# TYPE GalaxyRay_tasks_started_total counter\n");
     out.push_str(&format!(
-        "stellargate_tasks_started_total {}\n",
+        "GalaxyRay_tasks_started_total {}\n",
         tasks.started()
     ));
-    out.push_str("# HELP stellargate_tasks_stopped_total Total clean background task stops.\n");
-    out.push_str("# TYPE stellargate_tasks_stopped_total counter\n");
+    out.push_str("# HELP GalaxyRay_tasks_stopped_total Total clean background task stops.\n");
+    out.push_str("# TYPE GalaxyRay_tasks_stopped_total counter\n");
     out.push_str(&format!(
-        "stellargate_tasks_stopped_total {}\n",
+        "GalaxyRay_tasks_stopped_total {}\n",
         tasks.stopped()
     ));
-    out.push_str("# HELP stellargate_tasks_failed_total Total background task panics.\n");
-    out.push_str("# TYPE stellargate_tasks_failed_total counter\n");
+    out.push_str("# HELP GalaxyRay_tasks_failed_total Total background task panics.\n");
+    out.push_str("# TYPE GalaxyRay_tasks_failed_total counter\n");
     out.push_str(&format!(
-        "stellargate_tasks_failed_total {}\n",
+        "GalaxyRay_tasks_failed_total {}\n",
         tasks.failed()
     ));
     out.push_str(
-        "# HELP stellargate_task_restarts_total Supervisor restarts of a background task after panic or unexpected return.\n",
+        "# HELP GalaxyRay_task_restarts_total Supervisor restarts of a background task after panic or unexpected return.\n",
     );
-    out.push_str("# TYPE stellargate_task_restarts_total counter\n");
+    out.push_str("# TYPE GalaxyRay_task_restarts_total counter\n");
     let snaps = tasks.snapshot();
     for snap in &snaps {
         out.push_str(&format!(
-            "stellargate_task_restarts_total{{task=\"{}\"}} {}\n",
+            "GalaxyRay_task_restarts_total{{task=\"{}\"}} {}\n",
             snap.name, snap.restarts
         ));
     }
     out.push_str(
-        "# HELP stellargate_task_running Whether the named background task is currently running (1) or not (0).\n",
+        "# HELP GalaxyRay_task_running Whether the named background task is currently running (1) or not (0).\n",
     );
-    out.push_str("# TYPE stellargate_task_running gauge\n");
+    out.push_str("# TYPE GalaxyRay_task_running gauge\n");
     for snap in &snaps {
         out.push_str(&format!(
-            "stellargate_task_running{{task=\"{}\"}} {}\n",
+            "GalaxyRay_task_running{{task=\"{}\"}} {}\n",
             snap.name,
             if snap.running { 1 } else { 0 }
         ));
     }
     out.push_str(
-        "# HELP stellargate_task_consecutive_failures Consecutive panics of a background task since it last ran stably.\n",
+        "# HELP GalaxyRay_task_consecutive_failures Consecutive panics of a background task since it last ran stably.\n",
     );
-    out.push_str("# TYPE stellargate_task_consecutive_failures gauge\n");
+    out.push_str("# TYPE GalaxyRay_task_consecutive_failures gauge\n");
     for snap in &snaps {
         out.push_str(&format!(
-            "stellargate_task_consecutive_failures{{task=\"{}\"}} {}\n",
+            "GalaxyRay_task_consecutive_failures{{task=\"{}\"}} {}\n",
             snap.name, snap.consecutive_failures
         ));
     }
@@ -949,67 +949,67 @@ pub fn render(
     `started - stopped - failed` was not a live count and there was nothing to
     compare it against. These two gauges are that comparison, and
     `expected` already excludes deliberately-disabled workers. Alert on
-    `stellargate_tasks_live < stellargate_tasks_expected`. */
+    `GalaxyRay_tasks_live < GalaxyRay_tasks_expected`. */
     out.push_str(
-        "# HELP stellargate_tasks_expected Background workers this deployment expects to be running, excluding any disabled by configuration.\n",
+        "# HELP GalaxyRay_tasks_expected Background workers this deployment expects to be running, excluding any disabled by configuration.\n",
     );
-    out.push_str("# TYPE stellargate_tasks_expected gauge\n");
+    out.push_str("# TYPE GalaxyRay_tasks_expected gauge\n");
     out.push_str(&format!(
-        "stellargate_tasks_expected {}\n",
+        "GalaxyRay_tasks_expected {}\n",
         tasks.expected_tasks()
     ));
-    out.push_str("# HELP stellargate_tasks_live Expected background workers currently running.\n");
-    out.push_str("# TYPE stellargate_tasks_live gauge\n");
-    out.push_str(&format!("stellargate_tasks_live {}\n", tasks.live_tasks()));
+    out.push_str("# HELP GalaxyRay_tasks_live Expected background workers currently running.\n");
+    out.push_str("# TYPE GalaxyRay_tasks_live gauge\n");
+    out.push_str(&format!("GalaxyRay_tasks_live {}\n", tasks.live_tasks()));
 
     /* Separates "switched off on purpose" from "not running", which
-    `stellargate_task_running` alone reports identically. */
+    `GalaxyRay_task_running` alone reports identically. */
     out.push_str(
-        "# HELP stellargate_task_disabled Whether the named background task exited because configuration gave it nothing to do (1) or not (0).\n",
+        "# HELP GalaxyRay_task_disabled Whether the named background task exited because configuration gave it nothing to do (1) or not (0).\n",
     );
-    out.push_str("# TYPE stellargate_task_disabled gauge\n");
+    out.push_str("# TYPE GalaxyRay_task_disabled gauge\n");
     for snap in &snaps {
         out.push_str(&format!(
-            "stellargate_task_disabled{{task=\"{}\"}} {}\n",
+            "GalaxyRay_task_disabled{{task=\"{}\"}} {}\n",
             snap.name,
             if snap.disabled_reason.is_some() { 1 } else { 0 }
         ));
     }
 
-    // stellargate_horizon_poll_cycles_total — counter vec by outcome (#313)
+    // GalaxyRay_horizon_poll_cycles_total — counter vec by outcome (#313)
     out.push_str(
-        "# HELP stellargate_horizon_poll_cycles_total Total Horizon poll cycles by outcome.\n",
+        "# HELP GalaxyRay_horizon_poll_cycles_total Total Horizon poll cycles by outcome.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_poll_cycles_total counter\n");
+    out.push_str("# TYPE GalaxyRay_horizon_poll_cycles_total counter\n");
     out.push_str(&format!(
-        "stellargate_horizon_poll_cycles_total{{outcome=\"success\"}} {}\n",
+        "GalaxyRay_horizon_poll_cycles_total{{outcome=\"success\"}} {}\n",
         horizon.success()
     ));
     out.push_str(&format!(
-        "stellargate_horizon_poll_cycles_total{{outcome=\"rate_limited\"}} {}\n",
+        "GalaxyRay_horizon_poll_cycles_total{{outcome=\"rate_limited\"}} {}\n",
         horizon.rate_limited()
     ));
     out.push_str(&format!(
-        "stellargate_horizon_poll_cycles_total{{outcome=\"error\"}} {}\n",
+        "GalaxyRay_horizon_poll_cycles_total{{outcome=\"error\"}} {}\n",
         horizon.error()
     ));
 
     out.push_str(
-        "# HELP stellargate_horizon_repeated_cursor_4xx_total Horizon cursor incidents that reached three consecutive non-rate-limit 4xx responses.\n",
+        "# HELP GalaxyRay_horizon_repeated_cursor_4xx_total Horizon cursor incidents that reached three consecutive non-rate-limit 4xx responses.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_repeated_cursor_4xx_total counter\n");
+    out.push_str("# TYPE GalaxyRay_horizon_repeated_cursor_4xx_total counter\n");
     out.push_str(&format!(
-        "stellargate_horizon_repeated_cursor_4xx_total {}\n",
+        "GalaxyRay_horizon_repeated_cursor_4xx_total {}\n",
         horizon.repeated_cursor_4xx()
     ));
 
-    // stellargate_horizon_stream_reconnects_total — counter (#312)
+    // GalaxyRay_horizon_stream_reconnects_total — counter (#312)
     out.push_str(
-        "# HELP stellargate_horizon_stream_reconnects_total Total times the Horizon SSE stream listener reconnected.\n",
+        "# HELP GalaxyRay_horizon_stream_reconnects_total Total times the Horizon SSE stream listener reconnected.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_stream_reconnects_total counter\n");
+    out.push_str("# TYPE GalaxyRay_horizon_stream_reconnects_total counter\n");
     out.push_str(&format!(
-        "stellargate_horizon_stream_reconnects_total {}\n",
+        "GalaxyRay_horizon_stream_reconnects_total {}\n",
         horizon.stream_reconnects()
     ));
 
@@ -1019,147 +1019,147 @@ pub fn render(
     authoritative "on-chain detection last made progress" instant that
     /ready's cursor-freshness check reads. */
     out.push_str(
-        "# HELP stellargate_horizon_last_successful_poll_timestamp_seconds Unix timestamp of the last successful Horizon poll or stream event.\n",
+        "# HELP GalaxyRay_horizon_last_successful_poll_timestamp_seconds Unix timestamp of the last successful Horizon poll or stream event.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_last_successful_poll_timestamp_seconds gauge\n");
+    out.push_str("# TYPE GalaxyRay_horizon_last_successful_poll_timestamp_seconds gauge\n");
     out.push_str(&format!(
-        "stellargate_horizon_last_successful_poll_timestamp_seconds {}\n",
+        "GalaxyRay_horizon_last_successful_poll_timestamp_seconds {}\n",
         tasks.last_success_unix()
     ));
 
-    /* stellargate_horizon_cursor_age_seconds — gauge. Previously computed
+    /* GalaxyRay_horizon_cursor_age_seconds — gauge. Previously computed
     correctly in both poll_once and handle_stream_event and only ever logged
     (`info!(cursor_age_secs, ...)`); this is the same value, exported so
     payment-detection lag is alertable rather than something an operator has
     to grep logs for. */
     out.push_str(
-        "# HELP stellargate_horizon_cursor_age_seconds Age, in seconds, of the most recently processed Horizon payment record.\n",
+        "# HELP GalaxyRay_horizon_cursor_age_seconds Age, in seconds, of the most recently processed Horizon payment record.\n",
     );
-    out.push_str("# TYPE stellargate_horizon_cursor_age_seconds gauge\n");
+    out.push_str("# TYPE GalaxyRay_horizon_cursor_age_seconds gauge\n");
     out.push_str(&format!(
-        "stellargate_horizon_cursor_age_seconds {}\n",
+        "GalaxyRay_horizon_cursor_age_seconds {}\n",
         horizon.cursor_age_secs()
     ));
 
-    // stellargate_http_requests_total — counter vec by method/route/status.
+    // GalaxyRay_http_requests_total — counter vec by method/route/status.
     // Labelled by the matched route pattern, never the raw URI, so
     // cardinality is bounded by the fixed route table regardless of how many
     // distinct payment/merchant ids are requested.
     out.push_str(
-        "# HELP stellargate_http_requests_total Total HTTP requests by matched route, method, and status.\n",
+        "# HELP GalaxyRay_http_requests_total Total HTTP requests by matched route, method, and status.\n",
     );
-    out.push_str("# TYPE stellargate_http_requests_total counter\n");
+    out.push_str("# TYPE GalaxyRay_http_requests_total counter\n");
     for (method, route, status, count) in http.requests_snapshot() {
         out.push_str(&format!(
-            "stellargate_http_requests_total{{method=\"{method}\",route=\"{route}\",status=\"{status}\"}} {count}\n"
+            "GalaxyRay_http_requests_total{{method=\"{method}\",route=\"{route}\",status=\"{status}\"}} {count}\n"
         ));
     }
 
-    // stellargate_http_request_duration_seconds — histogram vec by method/route.
+    // GalaxyRay_http_request_duration_seconds — histogram vec by method/route.
     out.push_str(
-        "# HELP stellargate_http_request_duration_seconds HTTP request latency by matched route and method.\n",
+        "# HELP GalaxyRay_http_request_duration_seconds HTTP request latency by matched route and method.\n",
     );
-    out.push_str("# TYPE stellargate_http_request_duration_seconds histogram\n");
+    out.push_str("# TYPE GalaxyRay_http_request_duration_seconds histogram\n");
     for (method, route, lat) in http.latency_snapshot() {
         for (i, &bound_ms) in HTTP_LATENCY_BUCKETS_MS.iter().enumerate() {
             out.push_str(&format!(
-                "stellargate_http_request_duration_seconds_bucket{{method=\"{method}\",route=\"{route}\",le=\"{}\"}} {}\n",
+                "GalaxyRay_http_request_duration_seconds_bucket{{method=\"{method}\",route=\"{route}\",le=\"{}\"}} {}\n",
                 bound_ms as f64 / 1000.0,
                 lat.buckets[i]
             ));
         }
         out.push_str(&format!(
-            "stellargate_http_request_duration_seconds_bucket{{method=\"{method}\",route=\"{route}\",le=\"+Inf\"}} {}\n",
+            "GalaxyRay_http_request_duration_seconds_bucket{{method=\"{method}\",route=\"{route}\",le=\"+Inf\"}} {}\n",
             lat.buckets[HTTP_LATENCY_BUCKETS_MS.len()]
         ));
         out.push_str(&format!(
-            "stellargate_http_request_duration_seconds_sum{{method=\"{method}\",route=\"{route}\"}} {}\n",
+            "GalaxyRay_http_request_duration_seconds_sum{{method=\"{method}\",route=\"{route}\"}} {}\n",
             lat.sum_ms as f64 / 1000.0
         ));
         out.push_str(&format!(
-            "stellargate_http_request_duration_seconds_count{{method=\"{method}\",route=\"{route}\"}} {}\n",
+            "GalaxyRay_http_request_duration_seconds_count{{method=\"{method}\",route=\"{route}\"}} {}\n",
             lat.count
         ));
     }
 
-    // stellargate_payments_total — counter vec by lifecycle status.
-    out.push_str("# HELP stellargate_payments_total Total payments by lifecycle status.\n");
-    out.push_str("# TYPE stellargate_payments_total counter\n");
+    // GalaxyRay_payments_total — counter vec by lifecycle status.
+    out.push_str("# HELP GalaxyRay_payments_total Total payments by lifecycle status.\n");
+    out.push_str("# TYPE GalaxyRay_payments_total counter\n");
     out.push_str(&format!(
-        "stellargate_payments_total{{status=\"created\"}} {}\n",
+        "GalaxyRay_payments_total{{status=\"created\"}} {}\n",
         payments.created()
     ));
     out.push_str(&format!(
-        "stellargate_payments_total{{status=\"completed\"}} {}\n",
+        "GalaxyRay_payments_total{{status=\"completed\"}} {}\n",
         payments.completed()
     ));
     out.push_str(&format!(
-        "stellargate_payments_total{{status=\"overpaid\"}} {}\n",
+        "GalaxyRay_payments_total{{status=\"overpaid\"}} {}\n",
         payments.overpaid()
     ));
     out.push_str(&format!(
-        "stellargate_payments_total{{status=\"underpaid\"}} {}\n",
+        "GalaxyRay_payments_total{{status=\"underpaid\"}} {}\n",
         payments.underpaid()
     ));
     out.push_str(&format!(
-        "stellargate_payments_total{{status=\"expired\"}} {}\n",
+        "GalaxyRay_payments_total{{status=\"expired\"}} {}\n",
         payments.expired()
     ));
 
-    // stellargate_payment_settlement_latency_seconds — histogram: creation to
+    // GalaxyRay_payment_settlement_latency_seconds — histogram: creation to
     // the poller/stream settling (or partially settling) the intent.
     out.push_str(
-        "# HELP stellargate_payment_settlement_latency_seconds Time from payment creation to a settlement outcome (completed, overpaid, or underpaid).\n",
+        "# HELP GalaxyRay_payment_settlement_latency_seconds Time from payment creation to a settlement outcome (completed, overpaid, or underpaid).\n",
     );
-    out.push_str("# TYPE stellargate_payment_settlement_latency_seconds histogram\n");
+    out.push_str("# TYPE GalaxyRay_payment_settlement_latency_seconds histogram\n");
     for (i, &bound) in SETTLEMENT_LATENCY_BUCKETS_SECS.iter().enumerate() {
         out.push_str(&format!(
-            "stellargate_payment_settlement_latency_seconds_bucket{{le=\"{bound}\"}} {}\n",
+            "GalaxyRay_payment_settlement_latency_seconds_bucket{{le=\"{bound}\"}} {}\n",
             payments.settlement_latency_bucket(i)
         ));
     }
     out.push_str(&format!(
-        "stellargate_payment_settlement_latency_seconds_bucket{{le=\"+Inf\"}} {}\n",
+        "GalaxyRay_payment_settlement_latency_seconds_bucket{{le=\"+Inf\"}} {}\n",
         payments.settlement_latency_bucket(SETTLEMENT_LATENCY_BUCKETS_SECS.len())
     ));
     out.push_str(&format!(
-        "stellargate_payment_settlement_latency_seconds_sum {}\n",
+        "GalaxyRay_payment_settlement_latency_seconds_sum {}\n",
         payments.settlement_latency_sum_secs()
     ));
     out.push_str(&format!(
-        "stellargate_payment_settlement_latency_seconds_count {}\n",
+        "GalaxyRay_payment_settlement_latency_seconds_count {}\n",
         payments.settlement_latency_count()
     ));
 
-    // stellargate_db_pool_connections — gauge vec by state (issue: missing DB metrics).
+    // GalaxyRay_db_pool_connections — gauge vec by state (issue: missing DB metrics).
     out.push_str(
-        "# HELP stellargate_db_pool_connections Current SQLite connection pool size by state.\n",
+        "# HELP GalaxyRay_db_pool_connections Current SQLite connection pool size by state.\n",
     );
-    out.push_str("# TYPE stellargate_db_pool_connections gauge\n");
+    out.push_str("# TYPE GalaxyRay_db_pool_connections gauge\n");
     out.push_str(&format!(
-        "stellargate_db_pool_connections{{state=\"idle\"}} {}\n",
+        "GalaxyRay_db_pool_connections{{state=\"idle\"}} {}\n",
         db.pool_idle
     ));
     out.push_str(&format!(
-        "stellargate_db_pool_connections{{state=\"in_use\"}} {}\n",
+        "GalaxyRay_db_pool_connections{{state=\"in_use\"}} {}\n",
         db.pool_size.saturating_sub(db.pool_idle)
     ));
     out.push_str(
-        "# HELP stellargate_db_pool_max_connections Configured maximum SQLite connection pool size.\n",
+        "# HELP GalaxyRay_db_pool_max_connections Configured maximum SQLite connection pool size.\n",
     );
-    out.push_str("# TYPE stellargate_db_pool_max_connections gauge\n");
+    out.push_str("# TYPE GalaxyRay_db_pool_max_connections gauge\n");
     out.push_str(&format!(
-        "stellargate_db_pool_max_connections {}\n",
+        "GalaxyRay_db_pool_max_connections {}\n",
         db.pool_max
     ));
 
-    // stellargate_db_file_size_bytes — gauge vec by file. Omitted entirely
+    // GalaxyRay_db_file_size_bytes — gauge vec by file. Omitted entirely
     // (no series) for an in-memory database or a file that hasn't been
     // created yet, rather than rendered as a misleading zero.
     out.push_str(
-        "# HELP stellargate_db_file_size_bytes On-disk size of the SQLite database files, in bytes.\n",
+        "# HELP GalaxyRay_db_file_size_bytes On-disk size of the SQLite database files, in bytes.\n",
     );
-    out.push_str("# TYPE stellargate_db_file_size_bytes gauge\n");
+    out.push_str("# TYPE GalaxyRay_db_file_size_bytes gauge\n");
     for (file, bytes) in [
         ("main", db.main_bytes),
         ("wal", db.wal_bytes),
@@ -1167,66 +1167,66 @@ pub fn render(
     ] {
         if let Some(bytes) = bytes {
             out.push_str(&format!(
-                "stellargate_db_file_size_bytes{{file=\"{file}\"}} {bytes}\n"
+                "GalaxyRay_db_file_size_bytes{{file=\"{file}\"}} {bytes}\n"
             ));
         }
     }
 
-    // stellargate_missing_trustlines — gauge vec by asset
+    // GalaxyRay_missing_trustlines — gauge vec by asset
     out.push_str(
-        "# HELP stellargate_missing_trustlines Whether the gateway account is currently confirmed to have no usable trustline for an accepted asset (1) or confirmed to have one (0). A trustline is unusable when absent or when is_authorized=false. An asset is absent from this metric until the first successful trustline check evaluates it.\n",
+        "# HELP GalaxyRay_missing_trustlines Whether the gateway account is currently confirmed to have no usable trustline for an accepted asset (1) or confirmed to have one (0). A trustline is unusable when absent or when is_authorized=false. An asset is absent from this metric until the first successful trustline check evaluates it.\n",
     );
-    out.push_str("# TYPE stellargate_missing_trustlines gauge\n");
+    out.push_str("# TYPE GalaxyRay_missing_trustlines gauge\n");
     for (asset, missing) in trustlines.snapshot() {
         out.push_str(&format!(
-            "stellargate_missing_trustlines{{asset=\"{asset}\"}} {}\n",
+            "GalaxyRay_missing_trustlines{{asset=\"{asset}\"}} {}\n",
             if missing { 1 } else { 0 }
         ));
     }
 
-    // stellargate_trustline_unauthorized — gauge vec by asset
+    // GalaxyRay_trustline_unauthorized — gauge vec by asset
     // Distinguishes a trustline that is present but unauthorized from a
-    // missing trustline entirely; both surface as stellargate_missing_trustlines=1,
+    // missing trustline entirely; both surface as GalaxyRay_missing_trustlines=1,
     // but only the former shows here.
     out.push_str(
-        "# HELP stellargate_trustline_unauthorized Whether the gateway account's trustline for this asset is present but unauthorized (is_authorized=false). 1 means the issuer has not granted (or has revoked) authorization; payments in this asset will be rejected on-chain.\n",
+        "# HELP GalaxyRay_trustline_unauthorized Whether the gateway account's trustline for this asset is present but unauthorized (is_authorized=false). 1 means the issuer has not granted (or has revoked) authorization; payments in this asset will be rejected on-chain.\n",
     );
-    out.push_str("# TYPE stellargate_trustline_unauthorized gauge\n");
+    out.push_str("# TYPE GalaxyRay_trustline_unauthorized gauge\n");
     for (asset, unauth) in trustlines.snapshot_unauthorized() {
         out.push_str(&format!(
-            "stellargate_trustline_unauthorized{{asset=\"{asset}\"}} {}\n",
+            "GalaxyRay_trustline_unauthorized{{asset=\"{asset}\"}} {}\n",
             if unauth { 1 } else { 0 }
         ));
     }
 
-    // stellargate_trustline_headroom_stroops — gauge vec by asset
+    // GalaxyRay_trustline_headroom_stroops — gauge vec by asset
     // Remaining capacity (limit - balance) so an approaching ceiling is
     // visible before payments start bouncing.
     out.push_str(
-        "# HELP stellargate_trustline_headroom_stroops Remaining trustline capacity in stroops (limit - balance). A payment that would push balance past limit fails on-chain. Alert when this approaches the typical payment size.\n",
+        "# HELP GalaxyRay_trustline_headroom_stroops Remaining trustline capacity in stroops (limit - balance). A payment that would push balance past limit fails on-chain. Alert when this approaches the typical payment size.\n",
     );
-    out.push_str("# TYPE stellargate_trustline_headroom_stroops gauge\n");
+    out.push_str("# TYPE GalaxyRay_trustline_headroom_stroops gauge\n");
     for (asset, headroom) in trustlines.snapshot_headroom() {
         out.push_str(&format!(
-            "stellargate_trustline_headroom_stroops{{asset=\"{asset}\"}} {headroom}\n"
+            "GalaxyRay_trustline_headroom_stroops{{asset=\"{asset}\"}} {headroom}\n"
         ));
     }
 
     out.push_str(
-        "# HELP stellargate_trustline_check_failures_total Total trustline checks that could not reach Horizon or got a non-2xx response. Does not affect stellargate_missing_trustlines, which only reflects confirmed answers.\n",
+        "# HELP GalaxyRay_trustline_check_failures_total Total trustline checks that could not reach Horizon or got a non-2xx response. Does not affect GalaxyRay_missing_trustlines, which only reflects confirmed answers.\n",
     );
-    out.push_str("# TYPE stellargate_trustline_check_failures_total counter\n");
+    out.push_str("# TYPE GalaxyRay_trustline_check_failures_total counter\n");
     out.push_str(&format!(
-        "stellargate_trustline_check_failures_total {}\n",
+        "GalaxyRay_trustline_check_failures_total {}\n",
         trustlines.check_failures()
     ));
 
     out.push_str(
-        "# HELP stellargate_trustline_check_last_success_timestamp_seconds Unix timestamp of the last trustline check that got a confirmed answer from Horizon. 0 means never — treat stellargate_missing_trustlines as unknown, not confirmed, until this is nonzero.\n",
+        "# HELP GalaxyRay_trustline_check_last_success_timestamp_seconds Unix timestamp of the last trustline check that got a confirmed answer from Horizon. 0 means never — treat GalaxyRay_missing_trustlines as unknown, not confirmed, until this is nonzero.\n",
     );
-    out.push_str("# TYPE stellargate_trustline_check_last_success_timestamp_seconds gauge\n");
+    out.push_str("# TYPE GalaxyRay_trustline_check_last_success_timestamp_seconds gauge\n");
     out.push_str(&format!(
-        "stellargate_trustline_check_last_success_timestamp_seconds {}\n",
+        "GalaxyRay_trustline_check_last_success_timestamp_seconds {}\n",
         trustlines.last_success_unix()
     ));
 
@@ -1323,25 +1323,25 @@ mod tests {
 
         assert!(
             rendered.contains(
-                "stellargate_http_requests_total{method=\"GET\",route=\"/v1/payments/{id}\",status=\"200\"} 2"
+                "GalaxyRay_http_requests_total{method=\"GET\",route=\"/v1/payments/{id}\",status=\"200\"} 2"
             ),
             "got:\n{rendered}"
         );
         assert!(
             rendered.contains(
-                "stellargate_http_requests_total{method=\"GET\",route=\"/v1/payments/{id}\",status=\"404\"} 1"
+                "GalaxyRay_http_requests_total{method=\"GET\",route=\"/v1/payments/{id}\",status=\"404\"} 1"
             ),
             "got:\n{rendered}"
         );
         assert!(
             rendered.contains(
-                "stellargate_http_request_duration_seconds_count{method=\"GET\",route=\"/v1/payments/{id}\"} 3"
+                "GalaxyRay_http_request_duration_seconds_count{method=\"GET\",route=\"/v1/payments/{id}\"} 3"
             ),
             "the latency histogram must aggregate over the same bounded route \
              label as the counter:\n{rendered}"
         );
         assert!(
-            rendered.contains("stellargate_http_request_duration_seconds_sum{method=\"GET\",route=\"/v1/payments/{id}\"} 0.023"),
+            rendered.contains("GalaxyRay_http_request_duration_seconds_sum{method=\"GET\",route=\"/v1/payments/{id}\"} 0.023"),
             "sum must be in seconds, not milliseconds:\n{rendered}"
         );
     }
@@ -1363,13 +1363,13 @@ mod tests {
         );
 
         assert!(rendered.contains(
-            "stellargate_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"0.005\"} 1"
+            "GalaxyRay_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"0.005\"} 1"
         ));
         assert!(rendered.contains(
-            "stellargate_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"1\"} 2"
+            "GalaxyRay_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"1\"} 2"
         ));
         assert!(rendered.contains(
-            "stellargate_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"+Inf\"} 2"
+            "GalaxyRay_http_request_duration_seconds_bucket{method=\"GET\",route=\"/health\",le=\"+Inf\"} 2"
         ));
     }
 
@@ -1417,10 +1417,10 @@ mod tests {
             &empty_db_snapshot(),
         );
 
-        assert!(rendered.contains("stellargate_payments_total{status=\"created\"} 1"));
-        assert!(rendered.contains("stellargate_payments_total{status=\"overpaid\"} 1"));
-        assert!(rendered.contains("stellargate_payment_settlement_latency_seconds_count 1"));
-        assert!(rendered.contains("stellargate_payment_settlement_latency_seconds_sum 90"));
+        assert!(rendered.contains("GalaxyRay_payments_total{status=\"created\"} 1"));
+        assert!(rendered.contains("GalaxyRay_payments_total{status=\"overpaid\"} 1"));
+        assert!(rendered.contains("GalaxyRay_payment_settlement_latency_seconds_count 1"));
+        assert!(rendered.contains("GalaxyRay_payment_settlement_latency_seconds_sum 90"));
     }
 
     // ── HorizonMetrics cursor age ────────────────────────────────────────
@@ -1442,11 +1442,11 @@ mod tests {
             &empty_db_snapshot(),
         );
         assert!(
-            rendered.contains("# TYPE stellargate_horizon_cursor_age_seconds gauge"),
+            rendered.contains("# TYPE GalaxyRay_horizon_cursor_age_seconds gauge"),
             "got:\n{rendered}"
         );
         assert!(
-            rendered.contains("stellargate_horizon_cursor_age_seconds 37"),
+            rendered.contains("GalaxyRay_horizon_cursor_age_seconds 37"),
             "got:\n{rendered}"
         );
     }
@@ -1466,8 +1466,8 @@ mod tests {
             &PaymentMetrics::new(),
             &empty_db_snapshot(),
         );
-        assert!(rendered.contains("# TYPE stellargate_horizon_repeated_cursor_4xx_total counter"));
-        assert!(rendered.contains("stellargate_horizon_repeated_cursor_4xx_total 1"));
+        assert!(rendered.contains("# TYPE GalaxyRay_horizon_repeated_cursor_4xx_total counter"));
+        assert!(rendered.contains("GalaxyRay_horizon_repeated_cursor_4xx_total 1"));
     }
 
     // ── DbSnapshot ───────────────────────────────────────────────────────
@@ -1491,9 +1491,9 @@ mod tests {
             &PaymentMetrics::new(),
             &db,
         );
-        assert!(rendered.contains("stellargate_db_pool_connections{state=\"idle\"} 3"));
-        assert!(rendered.contains("stellargate_db_pool_connections{state=\"in_use\"} 1"));
-        assert!(rendered.contains("stellargate_db_pool_max_connections 10"));
+        assert!(rendered.contains("GalaxyRay_db_pool_connections{state=\"idle\"} 3"));
+        assert!(rendered.contains("GalaxyRay_db_pool_connections{state=\"in_use\"} 1"));
+        assert!(rendered.contains("GalaxyRay_db_pool_max_connections 10"));
     }
 
     #[test]
@@ -1508,7 +1508,7 @@ mod tests {
             &empty_db_snapshot(),
         );
         assert!(
-            !rendered.contains("stellargate_db_file_size_bytes{"),
+            !rendered.contains("GalaxyRay_db_file_size_bytes{"),
             "an in-memory database must render no file-size series, not a \
              misleading zero:\n{rendered}"
         );
@@ -1533,9 +1533,9 @@ mod tests {
             &PaymentMetrics::new(),
             &db,
         );
-        assert!(rendered.contains("stellargate_db_file_size_bytes{file=\"main\"} 4096"));
-        assert!(rendered.contains("stellargate_db_file_size_bytes{file=\"wal\"} 128"));
-        assert!(!rendered.contains("stellargate_db_file_size_bytes{file=\"shm\"}"));
+        assert!(rendered.contains("GalaxyRay_db_file_size_bytes{file=\"main\"} 4096"));
+        assert!(rendered.contains("GalaxyRay_db_file_size_bytes{file=\"wal\"} 128"));
+        assert!(!rendered.contains("GalaxyRay_db_file_size_bytes{file=\"shm\"}"));
     }
 
     // ── #440 new tests ────────────────────────────────────────────────────
@@ -1794,7 +1794,7 @@ mod tests {
         );
 
         assert!(
-            rendered.contains("stellargate_missing_trustlines{asset=\"USDC\"} 1"),
+            rendered.contains("GalaxyRay_missing_trustlines{asset=\"USDC\"} 1"),
             "missing trustline must render as 1:\n{rendered}"
         );
     }
@@ -1816,7 +1816,7 @@ mod tests {
         );
 
         assert!(
-            rendered.contains("stellargate_missing_trustlines{asset=\"USDC\"} 0"),
+            rendered.contains("GalaxyRay_missing_trustlines{asset=\"USDC\"} 0"),
             "present trustline must render as 0:\n{rendered}"
         );
     }
@@ -1838,12 +1838,12 @@ mod tests {
         );
 
         assert!(
-            rendered.contains("stellargate_trustline_check_failures_total 1"),
+            rendered.contains("GalaxyRay_trustline_check_failures_total 1"),
             "check_failures counter must be rendered:\n{rendered}"
         );
         // last_success_unix should be 0 (no successful check yet).
         assert!(
-            rendered.contains("stellargate_trustline_check_last_success_timestamp_seconds 0"),
+            rendered.contains("GalaxyRay_trustline_check_last_success_timestamp_seconds 0"),
             "last_success_unix must be 0 when no check has succeeded:\n{rendered}"
         );
     }

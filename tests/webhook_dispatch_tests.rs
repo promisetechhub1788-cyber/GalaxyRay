@@ -1,4 +1,4 @@
-//! Integration tests for `webhook::dispatch` against a mock HTTP server.
+﻿//! Integration tests for `webhook::dispatch` against a mock HTTP server.
 //!
 //! Covers request construction (signature header), retry-then-success, and
 //! exhausted-retries paths, asserting both the requests the mock server
@@ -9,7 +9,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
-use stellargate::{
+use galaxyray::{
     AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db,
@@ -76,13 +76,13 @@ async fn setup_state(cfg: Config) -> AppState {
         config: cfg,
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }
 }
 
@@ -128,7 +128,7 @@ async fn dispatch_delivers_successfully_with_valid_signature() {
     timestamp the request advertises in its header. */
     let timestamp: i64 = req
         .headers
-        .get("X-StellarGate-Timestamp")
+        .get("X-GalaxyRay-Timestamp")
         .expect("timestamp header must be present")
         .to_str()
         .unwrap()
@@ -137,14 +137,14 @@ async fn dispatch_delivers_successfully_with_valid_signature() {
     let expected_sig = webhook::sign(&state.config.webhook_secret, timestamp, &req.body);
     assert_eq!(
         req.headers
-            .get("X-StellarGate-Signature")
+            .get("X-GalaxyRay-Signature")
             .expect("signature header must be present")
             .to_str()
             .unwrap(),
         expected_sig
     );
     assert_eq!(
-        req.headers.get("X-StellarGate-Event").unwrap(),
+        req.headers.get("X-GalaxyRay-Event").unwrap(),
         "payment.completed"
     );
 
@@ -219,7 +219,7 @@ async fn dispatch_marks_failed_after_exhausting_retries() {
 async fn event_field_in_body_matches_header_and_is_covered_by_signature() {
     /* Security regression test for issue #160.
      *
-     * The X-StellarGate-Event header is NOT covered by the HMAC signature.
+     * The X-GalaxyRay-Event header is NOT covered by the HMAC signature.
      * Receivers MUST route on the `event` field inside the verified JSON body,
      * not on the header. This test asserts:
      *
@@ -251,8 +251,8 @@ async fn event_field_in_body_matches_header_and_is_covered_by_signature() {
     // 1. The header is present.
     let header_event = req
         .headers
-        .get("X-StellarGate-Event")
-        .expect("X-StellarGate-Event header must be present")
+        .get("X-GalaxyRay-Event")
+        .expect("X-GalaxyRay-Event header must be present")
         .to_str()
         .unwrap();
 
@@ -266,7 +266,7 @@ async fn event_field_in_body_matches_header_and_is_covered_by_signature() {
     // 3. Header and body agree (no tampering in this happy-path test).
     assert_eq!(
         header_event, body_event,
-        "X-StellarGate-Event header must mirror the body event field"
+        "X-GalaxyRay-Event header must mirror the body event field"
     );
     assert_eq!(body_event, "payment.completed");
 
@@ -274,7 +274,7 @@ async fn event_field_in_body_matches_header_and_is_covered_by_signature() {
     //    confirming the event type is authenticated through the body, not the header.
     let timestamp: i64 = req
         .headers
-        .get("X-StellarGate-Timestamp")
+        .get("X-GalaxyRay-Timestamp")
         .unwrap()
         .to_str()
         .unwrap()
@@ -283,7 +283,7 @@ async fn event_field_in_body_matches_header_and_is_covered_by_signature() {
     let expected_sig = webhook::sign(&state.config.webhook_secret, timestamp, &req.body);
     assert_eq!(
         req.headers
-            .get("X-StellarGate-Signature")
+            .get("X-GalaxyRay-Signature")
             .unwrap()
             .to_str()
             .unwrap(),

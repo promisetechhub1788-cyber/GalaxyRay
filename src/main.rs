@@ -1,4 +1,4 @@
-//! StellarGate binary entry point: boots configuration, storage and HTTP
+﻿//! GalaxyRay binary entry point: boots configuration, storage and HTTP
 //! clients, spawns the background listeners, serves the API, and drains
 //! everything on shutdown.
 
@@ -7,7 +7,7 @@ use std::future::Future;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
-use stellargate::{
+use galaxyray::{
     AppState, TaskHealth, api,
     config::{Config, ListenerMode},
     db, expiry, horizon,
@@ -21,7 +21,7 @@ use tokio::task::JoinHandle;
 use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
 
-const USER_AGENT: &str = concat!("StellarGate/", env!("CARGO_PKG_VERSION"));
+const USER_AGENT: &str = concat!("GalaxyRay/", env!("CARGO_PKG_VERSION"));
 
 /// Timeout for general outbound HTTP (Horizon). Webhook delivery uses its own
 /// configurable per-attempt timeout instead.
@@ -139,7 +139,7 @@ async fn main() -> Result<()> {
 
     let addr = format!("0.0.0.0:{}", state.config.port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
-    info!("StellarGate API listening on {addr}");
+    info!("GalaxyRay API listening on {addr}");
 
     // One overall deadline covers both the HTTP drain and the worker drain, so
     // the process can never overrun the orchestrator's stop grace period.

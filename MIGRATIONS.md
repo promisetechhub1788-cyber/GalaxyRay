@@ -1,8 +1,8 @@
-# Database Migrations
+﻿# Database Migrations
 
 ## How schema changes work
 
-StellarGate does **not** use a migration runner or a numbered `migrations/`
+GalaxyRay does **not** use a migration runner or a numbered `migrations/`
 directory. Schema evolution is handled entirely in [`src/db.rs`](src/db.rs) by
 the `db::migrate` function, which is called once from `main` before the HTTP
 listener binds.
@@ -37,7 +37,7 @@ policy for this project for the following reasons:
 
 ### 1. The target environment is a single-node SQLite deployment
 
-StellarGate targets a single Always-Free VM running one container with one
+GalaxyRay targets a single Always-Free VM running one container with one
 SQLite file on a named volume. There is no replica to keep in sync, no
 migration coordinator, and no mechanism for rolling a schema change back
 independently of the application binary. A "rollback" in this environment
@@ -58,7 +58,7 @@ Changes that are *not* backward-compatible (dropping a column, renaming a
 column, changing a column type, adding a `NOT NULL` constraint without a
 default) cannot currently be expressed without violating the idempotency
 requirement. If such a change is needed, resolve
-[issue #268](https://github.com/StellarGateLabs/StellarGate/issues/268)
+[issue #268](https://github.com/GalaxyRayLabs/GalaxyRay/issues/268)
 (adopting `sqlx::migrate!` with recorded schema versions) first.
 
 ### 3. The schema snapshot test catches drift

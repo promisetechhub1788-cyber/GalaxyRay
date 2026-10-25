@@ -1,6 +1,6 @@
-/* Playwright configuration for the dashboard end-to-end suite (#724, #726).
+﻿/* Playwright configuration for the dashboard end-to-end suite (#724, #726).
  *
- * The suite runs against a real `stellargate` binary with a real SQLite file,
+ * The suite runs against a real `GalaxyRay` binary with a real SQLite file,
  * not a mock: the point of these tests is to catch the class of failure that
  * only appears once the server, the router and the browser are all involved —
  * a module that 404s, a CSP that blocks a module import, a filter that the API
@@ -29,7 +29,7 @@ export const SEED_FILE = join(here, ".seed.json");
 export const DB_FILE = join(here, "playwright.db");
 
 /** The gateway binary, built by CI before the suite runs. */
-export const SERVER_BIN = join(repoRoot, "target", "debug", "stellargate");
+export const SERVER_BIN = join(repoRoot, "target", "debug", "GalaxyRay");
 
 /**
  * A long, non-placeholder secret. `config.rs` refuses known placeholder values
@@ -154,7 +154,7 @@ export default defineConfig({
       DATABASE_URL: `sqlite:${DB_FILE}`,
       /* Leaving the gateway unconfigured keeps the Horizon stream and poller
          idle, so the suite needs no Stellar node and no network. */
-      STELLAR_GATEWAY_PUBLIC: "UNCONFIGURED",
+      galaxy_rayWAY_PUBLIC: "UNCONFIGURED",
       STELLAR_NETWORK: "testnet",
       WEBHOOK_SECRET,
       ADMIN_PROVISIONING_SECRET: WEBHOOK_SECRET,

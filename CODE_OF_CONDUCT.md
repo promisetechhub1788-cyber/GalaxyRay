@@ -1,4 +1,4 @@
-# Contributor Covenant Code of Conduct
+﻿# Contributor Covenant Code of Conduct
 
 ## Our Pledge
 
@@ -52,15 +52,15 @@ for moderation decisions when appropriate.
 ## Scope
 
 This Code of Conduct applies within all community spaces (this repository's
-issues, pull requests, discussions, and any other official StellarGate
+issues, pull requests, discussions, and any other official GalaxyRay
 communication channels), and also applies when an individual is officially
 representing the community in public spaces.
 
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the maintainers via the [Security tab](https://github.com/StellarGateLabs/StellarGate/security/advisories/new)
-for sensitive reports, or by emailing **conduct@stellargate.dev**. All
+reported to the maintainers via the [Security tab](https://github.com/GalaxyRayLabs/GalaxyRay/security/advisories/new)
+for sensitive reports, or by emailing **conduct@GalaxyRay.dev**. All
 complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of

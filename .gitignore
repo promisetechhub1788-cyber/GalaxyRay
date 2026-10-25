@@ -10,12 +10,12 @@
 *.db-journal
 *.db-wal
 *.db-shm
-stellargate.db*
+galaxyray.db*
 
 # ── Environment / secrets ─────────────────────────────────────────────────────
 .env
 # Live deployment secrets — never commit.
-deploy/stellargate.env
+deploy/galaxyray.env
 
 # ── Build and distribution output ────────────────────────────────────────────
 /dist/

@@ -1,4 +1,4 @@
-# Base images are pinned by digest so silent upstream updates cannot change the
+﻿# Base images are pinned by digest so silent upstream updates cannot change the
 # build. Keep the rust tag in sync with rust-toolchain.toml / Cargo.toml MSRV.
 # To refresh a pin:
 #   docker buildx imagetools inspect rust:1.94-bookworm --format '{{.Manifest.Digest}}'
@@ -33,22 +33,22 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -r -u 1001 -U stellargate \
+RUN useradd -r -u 1001 -U GalaxyRay \
     && mkdir /data \
-    && chown stellargate:stellargate /data
+    && chown GalaxyRay:GalaxyRay /data
 
-COPY --from=builder /app/target/release/stellargate /usr/local/bin/stellargate
+COPY --from=builder /app/target/release/GalaxyRay /usr/local/bin/GalaxyRay
 
-USER stellargate
+USER GalaxyRay
 
-ENV DATABASE_URL=sqlite:///data/stellargate.db
+ENV DATABASE_URL=sqlite:///data/GalaxyRay.db
 
 EXPOSE 3000
 
-# The binary checks its own health (`stellargate healthcheck [path]`), so the
+# The binary checks its own health (`GalaxyRay healthcheck [path]`), so the
 # runtime image needs no HTTP client of its own. Compose files can override
 # `test:` to point at a different path (e.g. `/ready`) or timing.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["/usr/local/bin/stellargate", "healthcheck", "health"]
+    CMD ["/usr/local/bin/GalaxyRay", "healthcheck", "health"]
 
-CMD ["/usr/local/bin/stellargate"]
+CMD ["/usr/local/bin/GalaxyRay"]

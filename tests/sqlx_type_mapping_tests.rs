@@ -1,4 +1,4 @@
-//! Pins the SQLite → Rust decode mappings `src/db.rs` relies on (issue #644).
+﻿//! Pins the SQLite → Rust decode mappings `src/db.rs` relies on (issue #644).
 //!
 //! SQLite is dynamically typed, so every `query_scalar` / `query_as` /
 //! `Row::get` in the service leans on sqlx's per-type `compatible()` table to
@@ -17,7 +17,7 @@
 use sqlx::Row;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
-use stellargate::db;
+use galaxyray::db;
 
 async fn pool() -> db::Db {
     let pool = SqlitePoolOptions::new()

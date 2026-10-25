@@ -1,4 +1,4 @@
-//! Asserts a freshly `db::migrate`d database matches the checked-in schema
+﻿//! Asserts a freshly `db::migrate`d database matches the checked-in schema
 //! snapshot at `tests/schema_snapshot.sql` (issue #308).
 //!
 //! `db::migrate` (in `src/db.rs`) is the only schema definition that
@@ -16,7 +16,7 @@
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
-use stellargate::db;
+use galaxyray::db;
 
 const SNAPSHOT: &str = include_str!("schema_snapshot.sql");
 
@@ -54,7 +54,7 @@ struct TempDbFile(std::path::PathBuf);
 
 impl TempDbFile {
     fn new(label: &str) -> Self {
-        Self(std::env::temp_dir().join(format!("stellargate-{label}-{}.db", uuid::Uuid::new_v4())))
+        Self(std::env::temp_dir().join(format!("GalaxyRay-{label}-{}.db", uuid::Uuid::new_v4())))
     }
 
     async fn pool(&self) -> sqlx::SqlitePool {

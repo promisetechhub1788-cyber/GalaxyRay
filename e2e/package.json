@@ -1,9 +1,9 @@
-{
-  "name": "stellargate-dashboard-e2e",
+﻿{
+  "name": "GalaxyRay-dashboard-e2e",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "End-to-end smoke tests for the StellarGate operator dashboard (issues #724, #726). Dev-only; nothing here ships in the gateway binary.",
+  "description": "End-to-end smoke tests for the GalaxyRay operator dashboard (issues #724, #726). Dev-only; nothing here ships in the gateway binary.",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",

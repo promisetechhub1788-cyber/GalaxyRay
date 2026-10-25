@@ -1,4 +1,4 @@
-//! Regression coverage for issue #305: state-changing operations must emit
+﻿//! Regression coverage for issue #305: state-changing operations must emit
 //! a structured audit event carrying `audit=true`, an `action`, an `outcome`,
 //! the acting merchant (or admin), a `source_ip`, and a `request_id`.
 //!
@@ -11,7 +11,7 @@ use serde_json::{Value, json};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use stellargate::{
+use galaxyray::{
     AppState, api,
     config::{Config, ListenerMode},
     db,
@@ -27,7 +27,7 @@ fn make_config() -> Config {
         network: "testnet".into(),
         horizon_url: "https://horizon.invalid".into(),
         gateway_public: "UNCONFIGURED".into(),
-        accepted_assets: stellargate::config::AcceptedAsset::default_list(),
+        accepted_assets: galaxyray::config::AcceptedAsset::default_list(),
         webhook_secret: String::new(),
         webhook_retry_attempts: 1,
         webhook_retry_delay_ms: 0,
@@ -77,13 +77,13 @@ async fn test_server() -> TestServer {
         config: cfg,
         http,
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     TestServer::new(router)

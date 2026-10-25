@@ -1,4 +1,4 @@
-//! Dashboard asset checks.
+﻿//! Dashboard asset checks.
 //!
 //! The static checks below inspect the compiled-in JS directly; the router
 //! checks serve each asset through the real `api::router` so a response-builder
@@ -9,7 +9,7 @@ use axum_test::TestServer;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use stellargate::{
+use galaxyray::{
     AppState, api,
     config::{Config, ListenerMode},
     db,
@@ -38,7 +38,7 @@ fn make_config() -> Config {
         network: "testnet".into(),
         horizon_url: String::new(),
         gateway_public: "UNCONFIGURED".into(),
-        accepted_assets: stellargate::config::AcceptedAsset::default_list(),
+        accepted_assets: galaxyray::config::AcceptedAsset::default_list(),
         webhook_secret: String::new(),
         webhook_retry_attempts: 1,
         webhook_retry_delay_ms: 0,
@@ -846,7 +846,7 @@ fn theme_is_applied_before_first_paint() {
 #[test]
 fn theme_override_is_tri_state_and_persisted() {
     assert!(
-        DASHBOARD_JS.contains(r#"var THEME_KEY = "stellargate.theme";"#),
+        DASHBOARD_JS.contains(r#"var THEME_KEY = "GalaxyRay.theme";"#),
         "the preference must be stored under a stable key"
     );
     assert!(
@@ -1016,13 +1016,13 @@ async fn test_server() -> TestServer {
         config: cfg,
         http: reqwest::Client::new(),
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     TestServer::new(router)

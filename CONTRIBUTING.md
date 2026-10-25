@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 Thanks for taking the time to contribute. This document covers the conventions we expect in pull requests.
 
@@ -40,7 +40,7 @@ Every fix for a closed security or correctness issue must land with a test that 
 
 cp .env.example .env
 # Edit .env — at minimum you'll want STELLAR_NETWORK=testnet and a
-# STELLAR_GATEWAY_PUBLIC key if you're exercising the Horizon listener.
+# galaxy_rayWAY_PUBLIC key if you're exercising the Horizon listener.
 
 cargo build
 cargo test

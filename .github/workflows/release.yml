@@ -92,9 +92,9 @@ jobs:
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
-          name="stellargate-${version}-${{ matrix.target }}"
+          name="galaxyray-${version}-${{ matrix.target }}"
           mkdir -p dist
-          tar -C "target/${{ matrix.target }}/release" -czf "dist/${name}.tar.gz" stellargate
+          tar -C "target/${{ matrix.target }}/release" -czf "dist/${name}.tar.gz" galaxyray
           ( cd dist && sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256" )
 
       - name: Attest build provenance
@@ -125,7 +125,7 @@ jobs:
         with:
           context: .
           load: true
-          tags: stellargate:ci
+          tags: galaxyray:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -141,7 +141,7 @@ jobs:
           docker run -d --name sg -p 3000:3000 \
             -e STELLAR_GATEWAY_PUBLIC=UNCONFIGURED \
             -e WEBHOOK_SECRET=$(openssl rand -hex 32) \
-            stellargate:ci
+            galaxyray:ci
           for i in $(seq 1 30); do
             s=$(docker inspect -f '{{.State.Health.Status}}' sg)
             [ "$s" = healthy ] && exit 0
@@ -231,14 +231,14 @@ jobs:
         with:
           path: .
           format: cyclonedx-json
-          output-file: dist/stellargate.cdx.json
+          output-file: dist/galaxyray.cdx.json
           upload-artifact: false
           upload-release-assets: false
 
       - uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: dist/stellargate.cdx.json
+          path: dist/galaxyray.cdx.json
           retention-days: 1
 
   publish:

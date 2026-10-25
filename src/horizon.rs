@@ -1,4 +1,4 @@
-//! Stellar Horizon integration: detecting and verifying on-chain payments.
+﻿//! Stellar Horizon integration: detecting and verifying on-chain payments.
 //!
 //! A background poller periodically asks Horizon for the most recent payments
 //! into the gateway account, matches them against pending payment intents by
@@ -741,7 +741,7 @@ async fn fetch_account(state: &Arc<AppState>, url: String) -> anyhow::Result<Acc
 /// Best-effort by design: a Horizon error (unreachable, account not yet
 /// funded) is returned to the caller to log, but must not abort boot or the
 /// periodic checker — the account may be provisioned shortly after start.
-/// Such a failure bumps `stellargate_trustline_check_failures_total` and
+/// Such a failure bumps `GalaxyRay_trustline_check_failures_total` and
 /// leaves the per-asset gauge untouched, rather than reporting a guess.
 /// Returns the list of accepted asset codes that are missing a trustline
 /// (empty when all are present).
@@ -869,7 +869,7 @@ pub async fn run_trustline_checker(
 ) -> crate::supervise::TaskExit {
     if !state.config.gateway_configured() {
         return crate::supervise::TaskExit::DisabledByConfig(
-            "STELLAR_GATEWAY_PUBLIC is unconfigured",
+            "galaxy_rayWAY_PUBLIC is unconfigured",
         );
     }
 
@@ -1408,7 +1408,7 @@ fn next_poll_delay(consecutive_failures: u32, retry_after: Option<Duration>) -> 
 /// by the next success.
 pub async fn run_poller(state: Arc<AppState>, mut shutdown: watch::Receiver<bool>) {
     if !state.config.gateway_configured() {
-        warn!("STELLAR_GATEWAY_PUBLIC is unconfigured; Horizon poller disabled");
+        warn!("galaxy_rayWAY_PUBLIC is unconfigured; Horizon poller disabled");
         return;
     }
 
@@ -1509,7 +1509,7 @@ fn parse_sse_block(block: &str) -> SseEvent {
 /// connecting) while no gateway is configured.
 pub async fn run_stream_listener(state: Arc<AppState>, mut shutdown: watch::Receiver<bool>) {
     if !state.config.gateway_configured() {
-        warn!("STELLAR_GATEWAY_PUBLIC is unconfigured; Horizon stream listener disabled");
+        warn!("galaxy_rayWAY_PUBLIC is unconfigured; Horizon stream listener disabled");
         return;
     }
 
@@ -1519,7 +1519,7 @@ pub async fn run_stream_listener(state: Arc<AppState>, mut shutdown: watch::Rece
     the SSE connection is long-lived and must not be cut off mid-stream. */
     let client = match reqwest::Client::builder()
         .connect_timeout(Duration::from_secs(30))
-        .user_agent(concat!("StellarGate/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("GalaxyRay/", env!("CARGO_PKG_VERSION")))
         .build()
     {
         Ok(c) => c,

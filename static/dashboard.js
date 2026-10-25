@@ -1,4 +1,4 @@
-/* StellarGate dashboard.
+﻿/* GalaxyRay dashboard.
  *
  * A thin client over the same public REST API documented in the README: it
  * holds no privileged session of its own and adds no server-side state. The
@@ -45,8 +45,8 @@ import { sortPayments } from "./sort.js";
      end up with the prefix doubled. Pinned by `tests/dashboard_asset_tests.rs`,
      which counts the occurrences of the prefix across this file. */
   var API_BASE = "/v1";
-  var KEY_NAME = "stellargate.apiKey";
-  var KEY_SAVED_AT = "stellargate.apiKeySavedAt";
+  var KEY_NAME = "GalaxyRay.apiKey";
+  var KEY_SAVED_AT = "GalaxyRay.apiKeySavedAt";
 
   var t = window.I18N.t;
 
@@ -57,7 +57,7 @@ import { sortPayments } from "./sort.js";
   });
 
   // ── Preferences store (#771 / #772) ───────────────────────────────────────
-  // Persisted under its own namespace ("stellargate.prefs."), separate from the
+  // Persisted under its own namespace ("GalaxyRay.prefs."), separate from the
   // API key. Never stores the key, and never writes it anywhere.
   var prefs = createPrefsStore({
     local: (function () { try { return window.localStorage; } catch (e) { return null; } })(),
@@ -1478,7 +1478,7 @@ import { sortPayments } from "./sort.js";
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = filename || "stellargate-payments.csv";
+    a.download = filename || "GalaxyRay-payments.csv";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -1733,13 +1733,13 @@ import { sortPayments } from "./sort.js";
     $("refresh").addEventListener("click", function () { loadSummary(); reload(); });
 
     $("export-csv").addEventListener("click", function () {
-      exportCsv(store.get().loadedPayments, "stellargate-payments.csv");
+      exportCsv(store.get().loadedPayments, "GalaxyRay-payments.csv");
     });
 
     var exportSel = $("export-selected");
     if (exportSel) {
       exportSel.addEventListener("click", function () {
-        exportCsv(Object.values(selectedPayments), "stellargate-payments-selected.csv");
+        exportCsv(Object.values(selectedPayments), "GalaxyRay-payments-selected.csv");
       });
     }
 

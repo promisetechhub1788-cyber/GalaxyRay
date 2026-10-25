@@ -1,8 +1,8 @@
-# Caddy obtains and renews a Let's Encrypt certificate automatically. It needs
+﻿# Caddy obtains and renews a Let's Encrypt certificate automatically. It needs
 # DOMAIN to resolve to this VM's public IP before it can complete the ACME
 # challenge — point DNS first, then start the stack.
 #
-# DOMAIN and ACME_EMAIL come from deploy/stellargate.env.
+# DOMAIN and ACME_EMAIL come from deploy/GalaxyRay.env.
 
 {
 	email {$ACME_EMAIL}
@@ -23,7 +23,7 @@
 	# between the public internet and the app container — so the path is
 	# blocked here too, by default, rather than relying on the app-side gate
 	# alone (issue #250). To scrape from outside the Docker network instead,
-	# remove this block and set METRICS_TOKEN in deploy/stellargate.env.
+	# remove this block and set METRICS_TOKEN in deploy/GalaxyRay.env.
 	@metrics path /metrics /v1/metrics
 	respond @metrics 404
 

@@ -1,6 +1,6 @@
-# Production stack for a single always-on host (Oracle Cloud Always Free VM).
+﻿# Production stack for a single always-on host (Oracle Cloud Always Free VM).
 #
-#   docker compose --env-file deploy/stellargate.env \
+#   docker compose --env-file deploy/GalaxyRay.env \
 #     -f deploy/docker-compose.prod.yml up -d --pull always
 #
 # Caddy terminates TLS and proxies to the gateway, which is NOT published on a
@@ -12,11 +12,11 @@
 # "Upgrades and rollback" in DEPLOYMENT.md. For local development, the plain
 # `docker-compose.yml` at the repo root still builds from source.
 
-name: stellargate
+name: GalaxyRay
 
 services:
   app:
-    image: ghcr.io/stellargatelabs/stellargate:${STELLARGATE_VERSION:?Set STELLARGATE_VERSION in deploy/stellargate.env to a released tag, e.g. v1.2.3 — see https://github.com/StellarGateLabs/StellarGate/releases}
+    image: ghcr.io/GalaxyRaylabs/GalaxyRay:${GalaxyRay_VERSION:?Set GalaxyRay_VERSION in deploy/GalaxyRay.env to a released tag, e.g. v1.2.3 — see https://github.com/GalaxyRayLabs/GalaxyRay/releases}
     restart: unless-stopped
     # Compose's own default (10s) is shorter than the app's own
     # SHUTDOWN_GRACE_SECS drain budget (default 30s) — see "Shutdown grace"
@@ -37,19 +37,19 @@ services:
     expose:
       - "3000"
     env_file:
-      - ./stellargate.env
+      - ./GalaxyRay.env
     environment:
-      DATABASE_URL: sqlite:///data/stellargate.db
+      DATABASE_URL: sqlite:///data/GalaxyRay.db
       PORT: "3000"
     volumes:
-      - stellargate_data:/data
+      - GalaxyRay_data:/data
     healthcheck:
       # /ready, not /health: this reports unhealthy when the database or
       # Horizon is unreachable, which is what actually matters. It's also
       # exempt from the per-IP rate limiter (see DEPLOYMENT.md), so a traffic
       # spike can never turn this into a 429 and get the container restarted.
       # The binary checks its own health, so no HTTP client is needed in the image.
-      test: ["CMD", "/usr/local/bin/stellargate", "healthcheck", "ready"]
+      test: ["CMD", "/usr/local/bin/GalaxyRay", "healthcheck", "ready"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -81,7 +81,7 @@ services:
       - "443:443"
       - "443:443/udp" # HTTP/3
     env_file:
-      - ./stellargate.env
+      - ./GalaxyRay.env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data # ACME account + issued certificates — must persist
@@ -93,6 +93,6 @@ services:
         max-file: "3"
 
 volumes:
-  stellargate_data:
+  GalaxyRay_data:
   caddy_data:
   caddy_config:

@@ -1,13 +1,13 @@
-//! Outbound webhook delivery.
+﻿//! Outbound webhook delivery.
 //!
 //! When a payment reaches a terminal state we POST a signed JSON event to the
 //! merchant's `webhook_url`. To let receivers prove both authenticity and
 //! freshness, every request carries two headers:
 //!
-//! - `X-StellarGate-Timestamp`: the Unix time (seconds) the event was signed.
-//! - `X-StellarGate-Signature`: the hex HMAC-SHA256 of `"{timestamp}.{body}"`
+//! - `X-GalaxyRay-Timestamp`: the Unix time (seconds) the event was signed.
+//! - `X-GalaxyRay-Signature`: the hex HMAC-SHA256 of `"{timestamp}.{body}"`
 //!   (Stripe-style), keyed with the shared `WEBHOOK_SECRET`.
-//! - `X-StellarGate-Event`: a convenience copy of the `event` field from the
+//! - `X-GalaxyRay-Event`: a convenience copy of the `event` field from the
 //!   body, included so receivers can route cheaply before parsing JSON.
 //!   **This header is not covered by the HMAC signature.** It can be altered
 //!   in transit without invalidating the signature. Receivers that make
@@ -62,7 +62,7 @@ pub fn redact_url(raw: &str) -> String {
 /// The `body` is the full JSON event payload produced by [`build_payload`],
 /// which always includes an `"event"` field. Because the event type is part of
 /// the signed body, receivers can rely on it being authentic after verifying
-/// the signature — no separate signing of the `X-StellarGate-Event` header is
+/// the signature — no separate signing of the `X-GalaxyRay-Event` header is
 /// needed or performed.
 ///
 /// Receivers must recompute the signature over the same `"{timestamp}.{body}"`
@@ -139,7 +139,7 @@ pub fn build_payload(payment: &db::Payment, event: &str, delta: Option<&str>) ->
 ///
 /// The signed body (`"{timestamp}.{body}"`) already contains the `event` field,
 /// so the event type is fully authenticated by the HMAC signature. The
-/// `X-StellarGate-Event` header is also included as a routing convenience but
+/// `X-GalaxyRay-Event` header is also included as a routing convenience but
 /// is **not** covered by the signature — receivers must not use it for
 /// security-sensitive decisions.
 ///
@@ -182,7 +182,7 @@ pub async fn dispatch(state: &AppState, payment: &db::Payment, event: &str, delt
             /* This is a terminal failure and must be counted like one. It was
             not, so an entire class of permanent failure — a target that
             resolves into a blocked range — was invisible to
-            `stellargate_webhook_deliveries_total{outcome="failed"}` and to any
+            `GalaxyRay_webhook_deliveries_total{outcome="failed"}` and to any
             alert built on it (issues #319, #233). */
             state.webhook_metrics.record_failed();
             let _ = db::update_webhook_delivery(
@@ -210,9 +210,9 @@ pub async fn dispatch(state: &AppState, payment: &db::Payment, event: &str, delt
         let result = client
             .post(&url)
             .header("Content-Type", "application/json")
-            .header("X-StellarGate-Signature", &signature)
-            .header("X-StellarGate-Timestamp", timestamp.to_string())
-            .header("X-StellarGate-Event", event)
+            .header("X-GalaxyRay-Signature", &signature)
+            .header("X-GalaxyRay-Timestamp", timestamp.to_string())
+            .header("X-GalaxyRay-Event", event)
             .body(body.clone())
             .send()
             .await;
@@ -409,9 +409,9 @@ async fn redrive_one(state: &Arc<AppState>, delivery: db::WebhookDelivery) {
     let result = client
         .post(&delivery.url)
         .header("Content-Type", "application/json")
-        .header("X-StellarGate-Signature", &signature)
-        .header("X-StellarGate-Timestamp", timestamp.to_string())
-        .header("X-StellarGate-Event", &event)
+        .header("X-GalaxyRay-Signature", &signature)
+        .header("X-GalaxyRay-Timestamp", timestamp.to_string())
+        .header("X-GalaxyRay-Event", &event)
         .body(body.to_vec())
         .send()
         .await;
@@ -683,7 +683,7 @@ mod tests {
     fn build_payload_includes_event_in_signed_body() {
         // The `event` field must be present in the JSON body so that after
         // signature verification a receiver can read the authenticated event
-        // type from the body rather than from the unsigned X-StellarGate-Event
+        // type from the body rather than from the unsigned X-GalaxyRay-Event
         // header. This test locks that contract.
         let payment = db::Payment {
             id: "pay_1".into(),

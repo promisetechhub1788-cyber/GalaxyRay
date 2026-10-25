@@ -1,10 +1,10 @@
-# Webhook Reference Guide
+﻿# Webhook Reference Guide
 
-This is the **canonical webhook documentation** for StellarGate. For webhook delivery management endpoints (list/redeliver), see [Webhook Delivery Management](#webhook-delivery-management). For integration examples, see [Integration Examples](#integration-examples).
+This is the **canonical webhook documentation** for GalaxyRay. For webhook delivery management endpoints (list/redeliver), see [Webhook Delivery Management](#webhook-delivery-management). For integration examples, see [Integration Examples](#integration-examples).
 
 ## Overview
 
-When a payment reaches a terminal state, StellarGate POSTs a signed JSON event to your webhook endpoint. Every request carries cryptographic headers that let you verify both authenticity and freshness — preventing replay attacks and tampering.
+When a payment reaches a terminal state, GalaxyRay POSTs a signed JSON event to your webhook endpoint. Every request carries cryptographic headers that let you verify both authenticity and freshness — preventing replay attacks and tampering.
 
 ```
 Payment created (pending)
@@ -55,7 +55,7 @@ body, so they are covered by the HMAC signature.
 
 ## Event Types
 
-StellarGate fires exactly one event when a payment settles, determined by comparing received amount to requested amount:
+GalaxyRay fires exactly one event when a payment settles, determined by comparing received amount to requested amount:
 
 ### `payment.completed`
 
@@ -142,22 +142,22 @@ Every webhook request includes four headers:
 
 | Header | Description | Signed? |
 |---|---|---|
-| `X-StellarGate-Timestamp` | Unix time (seconds) when event was signed | ✅ Yes |
-| `X-StellarGate-Signature` | Hex HMAC-SHA256 of `"{timestamp}.{raw_body}"` | ✅ Yes |
-| `X-StellarGate-Event` | Copy of the `event` field from body (routing convenience) | ❌ No |
-| `X-StellarGate-Delivery` | Copy of the `id` field from body (deduplication convenience) | ❌ No |
+| `X-GalaxyRay-Timestamp` | Unix time (seconds) when event was signed | ✅ Yes |
+| `X-GalaxyRay-Signature` | Hex HMAC-SHA256 of `"{timestamp}.{raw_body}"` | ✅ Yes |
+| `X-GalaxyRay-Event` | Copy of the `event` field from body (routing convenience) | ❌ No |
+| `X-GalaxyRay-Delivery` | Copy of the `id` field from body (deduplication convenience) | ❌ No |
 
-**Important:** `X-StellarGate-Event` and `X-StellarGate-Delivery` are not covered by the HMAC signature. They mirror the body's `event` and `id` fields but can be altered in transit. Always read the event type and event id from the signed JSON body after verifying the signature.
+**Important:** `X-GalaxyRay-Event` and `X-GalaxyRay-Delivery` are not covered by the HMAC signature. They mirror the body's `event` and `id` fields but can be altered in transit. Always read the event type and event id from the signed JSON body after verifying the signature.
 
-**Retries are re-signed.** Each inline delivery attempt (including every retry after a backoff) is signed at send time with a fresh `X-StellarGate-Timestamp` and a matching `X-StellarGate-Signature`. Redrive and manual redelivery behave the same way. This means the timestamp always reflects when that particular attempt was sent, not when the event was first generated — so a retry that fires minutes after the original attempt still passes the freshness check below. The `id` in the body stays constant across attempts (see [Event identity and deduplication](#event-identity-and-deduplication)); only the signature headers change.
+**Retries are re-signed.** Each inline delivery attempt (including every retry after a backoff) is signed at send time with a fresh `X-GalaxyRay-Timestamp` and a matching `X-GalaxyRay-Signature`. Redrive and manual redelivery behave the same way. This means the timestamp always reflects when that particular attempt was sent, not when the event was first generated — so a retry that fires minutes after the original attempt still passes the freshness check below. The `id` in the body stays constant across attempts (see [Event identity and deduplication](#event-identity-and-deduplication)); only the signature headers change.
 
 ## Verifying Webhooks
 
 Use this recipe to verify each incoming webhook:
 
 1. **Extract headers:**
-   - Read `X-StellarGate-Timestamp` as `t` (Unix seconds)
-   - Read `X-StellarGate-Signature` as `sig` (hex string)
+   - Read `X-GalaxyRay-Timestamp` as `t` (Unix seconds)
+   - Read `X-GalaxyRay-Signature` as `sig` (hex string)
 
 2. **Check timestamp freshness:**
    - Reject if `abs(now - t) > tolerance`
@@ -179,7 +179,7 @@ Use this recipe to verify each incoming webhook:
    - After signature verification passes, parse the JSON
    - Read the `event` field from the body to determine the event type
    - Read the `id` field from the body and deduplicate on it
-   - Route based on `event` (not on the `X-StellarGate-Event` header)
+   - Route based on `event` (not on the `X-GalaxyRay-Event` header)
 
 ### Verification Examples
 
@@ -189,8 +189,8 @@ Use this recipe to verify each incoming webhook:
 const crypto = require("crypto");
 
 function verify(rawBody, headers, secret, toleranceSec = 300) {
-  const t = Number(headers["x-stellargate-timestamp"]);
-  const sig = headers["x-stellargate-signature"];
+  const t = Number(headers["x-GalaxyRay-timestamp"]);
+  const sig = headers["x-GalaxyRay-signature"];
   
   // 1. Check timestamp freshness
   if (!Number.isFinite(t) || Math.abs(Date.now() / 1000 - t) > toleranceSec) {

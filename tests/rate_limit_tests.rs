@@ -1,4 +1,4 @@
-//! Rate-limit behaviour lives in its own integration binary on purpose.
+﻿//! Rate-limit behaviour lives in its own integration binary on purpose.
 //!
 //! The broader API tests run at a high limit and exercise merchant auth heavily.
 //! Keeping the low-quota assertion here makes the expected 429 path explicit.
@@ -10,7 +10,7 @@ use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::future::IntoFuture;
 use std::str::FromStr;
 use std::sync::Arc;
-use stellargate::{
+use galaxyray::{
     AppState, api,
     config::{Config, ListenerMode},
     db,
@@ -23,7 +23,7 @@ fn make_config(rate_limit_requests_per_sec: u32) -> Config {
         network: "testnet".into(),
         horizon_url: String::new(),
         gateway_public: "UNCONFIGURED".into(),
-        accepted_assets: stellargate::config::AcceptedAsset::default_list(),
+        accepted_assets: galaxyray::config::AcceptedAsset::default_list(),
         webhook_secret: String::new(),
         webhook_retry_attempts: 1,
         webhook_retry_delay_ms: 0,
@@ -74,13 +74,13 @@ async fn server_with_config(cfg: Config) -> (TestServer, db::Db) {
         config: cfg,
         http,
         webhook_http: reqwest::Client::new(),
-        webhook_metrics: stellargate::metrics::WebhookMetrics::new(),
-        auth_metrics: stellargate::metrics::AuthMetrics::new(),
-        horizon_metrics: stellargate::metrics::HorizonMetrics::new(),
-        trustline_metrics: stellargate::metrics::TrustlineMetrics::new(),
-        http_metrics: stellargate::metrics::HttpMetrics::new(),
-        payment_metrics: stellargate::metrics::PaymentMetrics::new(),
-        task_health: stellargate::TaskHealth::new(),
+        webhook_metrics: galaxyray::metrics::WebhookMetrics::new(),
+        auth_metrics: galaxyray::metrics::AuthMetrics::new(),
+        horizon_metrics: galaxyray::metrics::HorizonMetrics::new(),
+        trustline_metrics: galaxyray::metrics::TrustlineMetrics::new(),
+        http_metrics: galaxyray::metrics::HttpMetrics::new(),
+        payment_metrics: galaxyray::metrics::PaymentMetrics::new(),
+        task_health: galaxyray::TaskHealth::new(),
     }))
     .into_make_service_with_connect_info::<std::net::SocketAddr>();
     (TestServer::new(router), pool)
@@ -190,7 +190,7 @@ async fn test_redeliver_rate_limit_exceeded_returns_429() {
 
     // A port nothing is listening on: the redelivery attempt fails fast
     // (connection refused) without depending on real network access.
-    stellargate::db::save_webhook_delivery(
+    galaxyray::db::save_webhook_delivery(
         &pool,
         "delivery-1",
         &id,

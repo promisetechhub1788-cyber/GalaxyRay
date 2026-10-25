@@ -1,4 +1,4 @@
-//! Measured write-throughput ceiling for the single-writer SQLite setup
+﻿//! Measured write-throughput ceiling for the single-writer SQLite setup
 //! (issue #321). Not run in CI — `#[ignore]`d, and deliberately not part of
 //! `cargo test --locked`'s default set, since it measures wall-clock
 //! performance rather than correctness and its number is only meaningful
@@ -26,7 +26,7 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
-use stellargate::db::{self, NewPayment};
+use galaxyray::db::{self, NewPayment};
 
 const CONCURRENCY: usize = 16;
 const DURATION: Duration = Duration::from_secs(10);
@@ -34,7 +34,7 @@ const DURATION: Duration = Duration::from_secs(10);
 #[tokio::test]
 #[ignore]
 async fn measures_sustained_payment_creation_throughput() {
-    let dir = std::env::temp_dir().join(format!("stellargate-bench-{}", uuid::Uuid::new_v4()));
+    let dir = std::env::temp_dir().join(format!("GalaxyRay-bench-{}", uuid::Uuid::new_v4()));
     std::fs::create_dir_all(&dir).unwrap();
     let db_path = dir.join("bench.db");
     let database_url = format!("sqlite://{}", db_path.display());

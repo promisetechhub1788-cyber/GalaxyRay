@@ -1,4 +1,4 @@
-//! Supervisor for long-running background tasks.
+﻿//! Supervisor for long-running background tasks.
 //!
 //! Each worker is spawned as a child task. A panic (or unexpected return) is
 //! logged and counted immediately, then the worker is restarted with bounded

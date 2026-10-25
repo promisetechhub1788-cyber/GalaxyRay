@@ -1,4 +1,4 @@
-//! Regression tests for closed security and correctness issues.
+﻿//! Regression tests for closed security and correctness issues.
 //!
 //! Convention (see CONTRIBUTING.md): every closed security or correctness
 //! issue gets one fast, black-box test here, named after the issue it pins

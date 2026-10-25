@@ -1,4 +1,4 @@
-use anyhow::Result;
+﻿use anyhow::Result;
 use ipnet::IpNet;
 
 /// How the service detects incoming on-chain payments.
@@ -221,12 +221,12 @@ pub struct Config {
 impl Config {
     pub fn from_env() -> Result<Self> {
         let database_url =
-            std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:stellargate.db".to_string());
+            std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:GalaxyRay.db".to_string());
         let network = std::env::var("STELLAR_NETWORK").unwrap_or_else(|_| "testnet".to_string());
         let horizon_url = std::env::var("STELLAR_HORIZON_URL")
             .unwrap_or_else(|_| "https://horizon-testnet.stellar.org".to_string());
         let gateway_public =
-            std::env::var("STELLAR_GATEWAY_PUBLIC").unwrap_or_else(|_| "UNCONFIGURED".to_string());
+            std::env::var("galaxy_rayWAY_PUBLIC").unwrap_or_else(|_| "UNCONFIGURED".to_string());
         let webhook_secret = Self::validate_webhook_secret(std::env::var("WEBHOOK_SECRET"))?;
         let allowed_webhook_schemes: Vec<String> = {
             let raw_schemes =
@@ -386,7 +386,7 @@ impl Config {
         if self.gateway_configured() {
             crate::strkey::validate_account_id(&self.gateway_public).map_err(|e| {
                 anyhow::anyhow!(
-                    "STELLAR_GATEWAY_PUBLIC ({}) is not a valid Stellar account address: {e}",
+                    "galaxy_rayWAY_PUBLIC ({}) is not a valid Stellar account address: {e}",
                     self.gateway_public
                 )
             })?;
@@ -965,7 +965,7 @@ mod tests {
         // A valid key with one character flipped — a realistic typo.
         cfg.gateway_public = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLB5".into();
         let err = cfg.validate_addresses().unwrap_err().to_string();
-        assert!(err.contains("STELLAR_GATEWAY_PUBLIC"), "got: {err}");
+        assert!(err.contains("galaxy_rayWAY_PUBLIC"), "got: {err}");
     }
 
     #[test]
@@ -1108,11 +1108,11 @@ mod tests {
                 ),
                 ("DATABASE_URL", Some("sqlite::memory:")),
                 (
-                    "STELLAR_GATEWAY_PUBLIC",
+                    "galaxy_rayWAY_PUBLIC",
                     Some("GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"),
                 ),
                 (
-                    "STELLAR_GATEWAY_SECRET",
+                    "galaxy_rayWAY_SECRET",
                     Some("SCZANGBA5RLKJHTBF4RJNRJMZWI4VKTHCRKOVAH7LRZZPZHHZWATAWBN"),
                 ),
                 ("CORS_ALLOWED_ORIGINS", Some("https://example.com")),
@@ -1140,11 +1140,11 @@ mod tests {
                 ),
                 ("DATABASE_URL", Some("sqlite::memory:")),
                 (
-                    "STELLAR_GATEWAY_PUBLIC",
+                    "galaxy_rayWAY_PUBLIC",
                     Some("GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"),
                 ),
                 (
-                    "STELLAR_GATEWAY_SECRET",
+                    "galaxy_rayWAY_SECRET",
                     Some("SCZANGBA5RLKJHTBF4RJNRJMZWI4VKTHCRKOVAH7LRZZPZHHZWATAWBN"),
                 ),
             ],

@@ -1,4 +1,4 @@
-/* Single source of truth for the dashboard's view state (issue #679).
+﻿/* Single source of truth for the dashboard's view state (issue #679).
  *
  * Before this existed, filters, the pagination cursor and the loaded rows lived
  * in ad-hoc closure variables that the DOM re-read on every render, so two parts
@@ -443,7 +443,7 @@ export function createRequestTracker() {
 /* ── Display preferences (#771, #772) ─────────────────────────────────────
  * Page size, auto-refresh, theme, timezone and column visibility are display
  * preferences, not secrets, so they are persisted in `localStorage` under a
- * dedicated `stellargate.prefs.` namespace. That namespace is deliberately
+ * dedicated `GalaxyRay.prefs.` namespace. That namespace is deliberately
  * disjoint from the API-key keys owned by `session.js`: nothing here reads or
  * writes the key, and nothing here logs a value, so a preference can never
  * carry the key into storage, a URL or the console.
@@ -453,7 +453,7 @@ export function createRequestTracker() {
  * missing entry falls back to the default rather than breaking the page. */
 
 /** Prefix for every preference key. Never used for the API key. */
-export const PREFS_NAMESPACE = "stellargate.prefs.";
+export const PREFS_NAMESPACE = "GalaxyRay.prefs.";
 
 /** The themes the stylesheet understands. */
 export const THEMES = ["system", "light", "dark"];

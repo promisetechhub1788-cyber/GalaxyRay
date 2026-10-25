@@ -1,7 +1,7 @@
+﻿
+# GalaxyRay
 
-# StellarGate
-
-[![CI](https://github.com/StellarGateLabs/StellarGate/actions/workflows/ci.yml/badge.svg)](https://github.com/StellarGateLabs/StellarGate/actions/workflows/ci.yml)
+[![CI](https://github.com/GalaxyRayLabs/GalaxyRay/actions/workflows/ci.yml/badge.svg)](https://github.com/GalaxyRayLabs/GalaxyRay/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.94%2B-orange.svg)](https://www.rust-lang.org)
 
@@ -39,7 +39,7 @@ A payment gateway API built on [Stellar](https://stellar.org) for accepting, ver
 
 ## Overview
 
-StellarGate turns Stellar payments into a conventional REST API. A merchant creates a **payment intent** and receives a destination address plus a unique memo. The payer sends funds from any Stellar wallet. StellarGate watches the chain, matches the incoming transaction to the intent, settles it, and delivers a signed webhook to the merchant's application.
+GalaxyRay turns Stellar payments into a conventional REST API. A merchant creates a **payment intent** and receives a destination address plus a unique memo. The payer sends funds from any Stellar wallet. GalaxyRay watches the chain, matches the incoming transaction to the intent, settles it, and delivers a signed webhook to the merchant's application.
 
 The gateway is **non-custodial in the strictest sense**: it never holds a secret key, never signs, and never submits a Stellar transaction. It only *observes* the configured gateway account for incoming payments. Refunds and payouts remain the merchant's responsibility.
 
@@ -47,7 +47,7 @@ The gateway is **non-custodial in the strictest sense**: it never holds a secret
 
 ```
 ┌─────────────┐   1. POST /payments      ┌──────────────┐
-│ Merchant    │ ───────────────────────► │ StellarGate  │
+│ Merchant    │ ───────────────────────► │ GalaxyRay  │
 │ Application │ ◄─────────────────────── │              │
 └─────────────┘   address + memo + id    └──────┬───────┘
        │                                        │
@@ -145,11 +145,11 @@ tests/             Integration tests (API, concurrency, rate limits, webhooks, t
 ### Install and Run
 
 ```bash
-git clone https://github.com/StellarGateLabs/StellarGate.git
-cd StellarGate
+git clone https://github.com/GalaxyRayLabs/GalaxyRay.git
+cd GalaxyRay
 
 cp .env.example .env
-# Edit .env — at minimum set STELLAR_GATEWAY_PUBLIC, WEBHOOK_SECRET,
+# Edit .env — at minimum set galaxy_rayWAY_PUBLIC, WEBHOOK_SECRET,
 # and ADMIN_PROVISIONING_SECRET
 
 cargo run
@@ -166,7 +166,7 @@ cp .env.example .env   # edit as above
 docker compose up --build
 ```
 
-The SQLite database lives in a named volume (`stellargate_data`) and survives container restarts. `docker compose down` stops the stack while preserving that volume.
+The SQLite database lives in a named volume (`GalaxyRay_data`) and survives container restarts. `docker compose down` stops the stack while preserving that volume.
 
 ### Verify the Installation
 
@@ -213,7 +213,7 @@ restarting from the top of the document.
 
 The page follows the OS light/dark preference, and a toggle on the sign-in card
 and in the top bar overrides it. The choice is remembered in `localStorage`
-under `stellargate.theme` and applied before the first paint, so it never
+under `GalaxyRay.theme` and applied before the first paint, so it never
 flashes; with nothing stored, the page keeps following the OS.
 
 **Accessibility.** The detail panel is a real modal `<dialog>` with a focus
@@ -262,10 +262,10 @@ All configuration is via environment variables, read once at startup. **Invalid 
 | Variable | Description | Default |
 |---|---|---|
 | `PORT` | HTTP listen port | `3000` |
-| `DATABASE_URL` | sqlx connection string (not a file path) | `sqlite:stellargate.db` |
+| `DATABASE_URL` | sqlx connection string (not a file path) | `sqlite:GalaxyRay.db` |
 | `STELLAR_NETWORK` | `testnet` or `public` | `testnet` |
 | `STELLAR_HORIZON_URL` | Horizon endpoint | testnet Horizon |
-| `STELLAR_GATEWAY_PUBLIC` | Gateway wallet public key (`G…`), validated as a strkey at startup. The listener stays idle until this is set. | — |
+| `galaxy_rayWAY_PUBLIC` | Gateway wallet public key (`G…`), validated as a strkey at startup. The listener stays idle until this is set. | — |
 | `ACCEPTED_ASSETS` | Comma-separated. Only native XLM may be written as a bare `CODE`. Every other asset is `CODE:ISSUER` (`USDC:GA…`). A typo like `ACCEPTED_ASSETS=XLM,USDC` used to treat native XLM as settling USDC intents; boot now refuses it (issue #221). Duplicate codes are also refused (issue #222). Each issuer is strkey-validated. Adding an asset is config-only — but see [Trustlines](#trustlines). | `XLM,USDC:<testnet issuer>` |
 | `REQUEST_TIMEOUT_SECS` | Whole-request timeout; exceeding it returns `408` | `30` |
 | `MAX_PAYMENT_AMOUNT` | Maximum amount `POST /payments` accepts, in the asset's own units. A bare number (`100000`) applies to every asset; `CODE:AMOUNT` (`USDC:50000`) pins a bound to one asset specifically and always wins over the default; mix both with commas (`100000,USDC:50000`). Exceeding it returns `400 amount_out_of_range` naming the configured limit — distinct from `invalid_amount`, which means the value itself is malformed. Unset means no bound beyond `i64` overflow in `parse_stroops` (issue #310). | unset |
@@ -274,7 +274,7 @@ All configuration is via environment variables, read once at startup. **Invalid 
 ### Trustlines
 
 **Every non-native asset in `ACCEPTED_ASSETS` needs a trustline on the gateway
-account.** This is a Stellar rule, not a StellarGate one: an account cannot hold
+account.** This is a Stellar rule, not a GalaxyRay one: an account cannot hold
 an asset it does not trust, so a payment in an untrusted asset **fails on-chain**
 before the gateway ever sees it. Nothing in the API can rescue it — the intent
 sits `pending` until it expires while the payer's transaction is rejected.
@@ -282,7 +282,7 @@ sits `pending` until it expires while the payer's transaction is rejected.
 XLM is native and never needs one. `ACCEPTED_ASSETS` defaults to including USDC,
 so a fresh account will be missing that trustline.
 
-StellarGate checks at startup and names anything missing:
+GalaxyRay checks at startup and names anything missing:
 
 ```
 WARN gateway account has no trustline for an accepted asset;
@@ -307,42 +307,42 @@ grep-only:
 
 ```
 # a confirmed-missing or unauthorized trustline
-stellargate_missing_trustlines{asset="USDC"} 1
+GalaxyRay_missing_trustlines{asset="USDC"} 1
 
 # trustline exists but is_authorized=false (issuer revoked authorization)
-stellargate_trustline_unauthorized{asset="USDC"} 1
+GalaxyRay_trustline_unauthorized{asset="USDC"} 1
 
 # remaining capacity in stroops (limit - balance); alert when near your typical payment size
-stellargate_trustline_headroom_stroops{asset="USDC"} 9223372036854775807
+GalaxyRay_trustline_headroom_stroops{asset="USDC"} 9223372036854775807
 
 # how many checks have failed to reach Horizon at all — distinct from a
 # confirmed-absent trustline, which only ever comes from a check that
 # actually got an answer
-stellargate_trustline_check_failures_total 0
+GalaxyRay_trustline_check_failures_total 0
 
 # unix timestamp of the last check that got a confirmed answer; 0 means
-# never — treat stellargate_missing_trustlines as unknown, not confirmed,
+# never — treat GalaxyRay_missing_trustlines as unknown, not confirmed,
 # until this is nonzero
-stellargate_trustline_check_last_success_timestamp_seconds 1732000000
+GalaxyRay_trustline_check_last_success_timestamp_seconds 1732000000
 ```
 
-`stellargate_missing_trustlines=1` covers two distinct cases — both cause payments
+`GalaxyRay_missing_trustlines=1` covers two distinct cases — both cause payments
 to bounce on-chain:
 
 - **No trustline** — the account has no balance line for this asset. Add one with `changeTrust`.
 - **Unauthorized trustline** — the balance line exists but `is_authorized=false`. The issuer uses
   `AUTH_REQUIRED` and has not yet granted (or has revoked) authorization. Contact the issuer.
 
-`stellargate_trustline_unauthorized` distinguishes the second case from the first, so an alert can
+`GalaxyRay_trustline_unauthorized` distinguishes the second case from the first, so an alert can
 recommend the right action.
 
-`stellargate_trustline_headroom_stroops` is the remaining capacity (`limit - balance`). A payment
+`GalaxyRay_trustline_headroom_stroops` is the remaining capacity (`limit - balance`). A payment
 that would push the balance past `limit` fails on-chain just like a missing trustline. Alert when
 this approaches your typical payment size.
 
 A Horizon outage during a check only increments
-`stellargate_trustline_check_failures_total`; it leaves the last confirmed
-`stellargate_missing_trustlines` value alone rather than guessing, so "Horizon
+`GalaxyRay_trustline_check_failures_total`; it leaves the last confirmed
+`GalaxyRay_missing_trustlines` value alone rather than guessing, so "Horizon
 is unreachable" and "trustline confirmed absent" never look the same on the
 scrape.
 
@@ -356,12 +356,12 @@ chance to confirm.
 To check what the account currently trusts directly against Horizon:
 
 ```bash
-curl -s "https://horizon-testnet.stellar.org/accounts/$STELLAR_GATEWAY_PUBLIC" \
+curl -s "https://horizon-testnet.stellar.org/accounts/$galaxy_rayWAY_PUBLIC" \
   | jq '.balances[] | {asset: (.asset_code // "XLM"), issuer: .asset_issuer}'
 ```
 
 Adding one is a `changeTrust` operation signed by the gateway account's **secret
-key** — done once, from a wallet or script you control, never by StellarGate,
+key** — done once, from a wallet or script you control, never by GalaxyRay,
 which holds no secret key and cannot do it for you. Any Stellar wallet
 (Lobstr, Freighter) can add a trustline, or use the SDK:
 
@@ -409,7 +409,7 @@ least the `Retry-After` it sends; any other failure, or a rate limit with no
 `POLL_INTERVAL_SECS` by the next successful cycle. Each cycle's catch-up loop
 is also capped at 25 pages (5,000 records), so a backlog built up while
 throttled cannot immediately re-trip the same limit — it drains over
-subsequent cycles instead. See `stellargate_horizon_poll_cycles_total` under
+subsequent cycles instead. See `GalaxyRay_horizon_poll_cycles_total` under
 [Observability](#observability) to track this.
 
 **First-run cursor baselining.** The very first time the poller runs (no
@@ -1252,7 +1252,7 @@ Requeueing via the endpoint above sets `acknowledged_at`, which returns the row
 to ordinary retention.
 
 Terminal failures are also counted in
-`stellargate_webhook_deliveries_total{outcome="failed"}` — **including** the
+`GalaxyRay_webhook_deliveries_total{outcome="failed"}` — **including** the
 SSRF-blocked path, which previously incremented nothing, leaving a whole class
 of permanent failure invisible to alerts.
 
@@ -1360,7 +1360,7 @@ Every on-chain payment matched by memo, destination, and asset resolves as follo
 
 ## Webhooks
 
-When a payment reaches a terminal state, StellarGate POSTs a signed JSON event to the intent's `webhook_url`.
+When a payment reaches a terminal state, GalaxyRay POSTs a signed JSON event to the intent's `webhook_url`.
 
 ### Events
 
@@ -1424,9 +1424,9 @@ record instead.
 
 | Header | Value |
 |---|---|
-| `X-StellarGate-Timestamp` | Unix seconds at signing time |
-| `X-StellarGate-Signature` | Hex HMAC-SHA256 of `"{timestamp}.{raw_body}"`, keyed with `WEBHOOK_SECRET` |
-| `X-StellarGate-Event` | Convenience copy of the event type — **not signed** |
+| `X-GalaxyRay-Timestamp` | Unix seconds at signing time |
+| `X-GalaxyRay-Signature` | Hex HMAC-SHA256 of `"{timestamp}.{raw_body}"`, keyed with `WEBHOOK_SECRET` |
+| `X-GalaxyRay-Event` | Convenience copy of the event type — **not signed** |
 
 Binding the signature to the timestamp (Stripe-style) is what prevents indefinite replay of a captured request.
 
@@ -1437,7 +1437,7 @@ Binding the signature to the timestamp (Stripe-style) is what prevents indefinit
 5. Compare against `sig` in **constant time**.
 6. Only after the signature passes, read `event` from the **body**.
 
-> ⚠️ Never route security-sensitive logic on `X-StellarGate-Event`. It is outside the signed material and can be altered in transit without invalidating the signature. The `event` field inside the verified body is authoritative.
+> ⚠️ Never route security-sensitive logic on `X-GalaxyRay-Event`. It is outside the signed material and can be altered in transit without invalidating the signature. The `event` field inside the verified body is authoritative.
 
 **Node.js**
 
@@ -1445,8 +1445,8 @@ Binding the signature to the timestamp (Stripe-style) is what prevents indefinit
 const crypto = require("crypto");
 
 function verify(rawBody, headers, secret, toleranceSec = 300) {
-  const t = Number(headers["x-stellargate-timestamp"]);
-  const sig = headers["x-stellargate-signature"];
+  const t = Number(headers["x-GalaxyRay-timestamp"]);
+  const sig = headers["x-GalaxyRay-signature"];
   if (!Number.isFinite(t) || Math.abs(Date.now() / 1000 - t) > toleranceSec) {
     return false; // stale or missing timestamp
   }
@@ -1478,7 +1478,7 @@ import hmac, hashlib, time
 
 def verify(raw_body: bytes, headers, secret: str, tolerance: int = 300) -> bool:
     try:
-        t = int(headers["X-StellarGate-Timestamp"])
+        t = int(headers["X-GalaxyRay-Timestamp"])
     except (KeyError, ValueError):
         return False
     if abs(time.time() - t) > tolerance:
@@ -1486,7 +1486,7 @@ def verify(raw_body: bytes, headers, secret: str, tolerance: int = 300) -> bool:
     expected = hmac.new(
         secret.encode(), f"{t}.".encode() + raw_body, hashlib.sha256
     ).hexdigest()
-    return hmac.compare_digest(expected, headers.get("X-StellarGate-Signature", ""))
+    return hmac.compare_digest(expected, headers.get("X-GalaxyRay-Signature", ""))
 ```
 
 ### Delivery Guarantees
@@ -1529,56 +1529,56 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 | Metric | Type | Description |
 |---|---|---|
-| `stellargate_auth_attempts_total` | counter | Labelled by `outcome`, and `reason` on failure (`missing_key`, `invalid_key`) |
-| `stellargate_webhook_deliveries_total` | counter | Delivery outcomes |
-| `stellargate_webhook_retries_total` | counter | Retry attempts |
-| `stellargate_webhook_delivery_latency_ms` | histogram | End-to-end delivery latency |
-| `stellargate_tasks_started_total` | counter | Background task starts (including restarts) |
-| `stellargate_tasks_stopped_total` | counter | Clean background task stops |
-| `stellargate_tasks_failed_total` | counter | Background task panics |
-| `stellargate_task_restarts_total` | counter | Supervisor restarts, labelled by `task` |
-| `stellargate_task_running` | gauge | `1` if the named task is running |
-| `stellargate_task_consecutive_failures` | gauge | Consecutive panics since the last stable run |
-| `stellargate_tasks_expected` | gauge | Workers this deployment expects to be running, excluding any disabled by configuration |
-| `stellargate_tasks_live` | gauge | Expected workers currently running |
-| `stellargate_task_disabled` | gauge | `1` if the named task exited because configuration gave it nothing to do |
-| `stellargate_horizon_poll_cycles_total` | counter | Horizon poll cycles, labelled by `outcome` (`success`, `rate_limited`, `error`) |
-| `stellargate_horizon_last_successful_poll_timestamp_seconds` | gauge | Unix timestamp of the last successful Horizon poll or stream event |
-| `stellargate_horizon_cursor_age_seconds` | gauge | Age of the most recently processed Horizon payment record — the sharpest signal of payment-detection lag |
-| `stellargate_http_requests_total` | counter | HTTP requests, labelled by `method`, matched `route` (never the raw path — bounded cardinality), and `status` |
-| `stellargate_http_request_duration_seconds` | histogram | HTTP request latency, labelled by `method` and matched `route` |
-| `stellargate_payments_total` | counter | Payments labelled by lifecycle `status` (`created`, `completed`, `overpaid`, `underpaid`, `expired`) |
-| `stellargate_payment_settlement_latency_seconds` | histogram | Time from payment creation to a settlement outcome |
-| `stellargate_db_pool_connections` | gauge | SQLite connection pool size, labelled by `state` (`idle`, `in_use`) |
-| `stellargate_db_pool_max_connections` | gauge | Configured maximum pool size |
-| `stellargate_db_file_size_bytes` | gauge | On-disk size of the SQLite database files, labelled by `file` (`main`, `wal`, `shm`); absent for an in-memory database |
-| `stellargate_missing_trustlines` | gauge | `1` if the gateway account has no usable trustline for this asset (absent or unauthorized); `0` if confirmed usable |
-| `stellargate_trustline_unauthorized` | gauge | `1` if the trustline exists but `is_authorized=false` (issuer revoked/has not granted authorization) |
-| `stellargate_trustline_headroom_stroops` | gauge | Remaining trustline capacity in stroops (`limit - balance`); alert when near your typical payment size |
-| `stellargate_trustline_check_failures_total` | counter | Trustline checks that failed to reach Horizon (does not affect `stellargate_missing_trustlines`) |
-| `stellargate_trustline_check_last_success_timestamp_seconds` | gauge | Unix timestamp of the last confirmed trustline check; `0` until first success |
+| `GalaxyRay_auth_attempts_total` | counter | Labelled by `outcome`, and `reason` on failure (`missing_key`, `invalid_key`) |
+| `GalaxyRay_webhook_deliveries_total` | counter | Delivery outcomes |
+| `GalaxyRay_webhook_retries_total` | counter | Retry attempts |
+| `GalaxyRay_webhook_delivery_latency_ms` | histogram | End-to-end delivery latency |
+| `GalaxyRay_tasks_started_total` | counter | Background task starts (including restarts) |
+| `GalaxyRay_tasks_stopped_total` | counter | Clean background task stops |
+| `GalaxyRay_tasks_failed_total` | counter | Background task panics |
+| `GalaxyRay_task_restarts_total` | counter | Supervisor restarts, labelled by `task` |
+| `GalaxyRay_task_running` | gauge | `1` if the named task is running |
+| `GalaxyRay_task_consecutive_failures` | gauge | Consecutive panics since the last stable run |
+| `GalaxyRay_tasks_expected` | gauge | Workers this deployment expects to be running, excluding any disabled by configuration |
+| `GalaxyRay_tasks_live` | gauge | Expected workers currently running |
+| `GalaxyRay_task_disabled` | gauge | `1` if the named task exited because configuration gave it nothing to do |
+| `GalaxyRay_horizon_poll_cycles_total` | counter | Horizon poll cycles, labelled by `outcome` (`success`, `rate_limited`, `error`) |
+| `GalaxyRay_horizon_last_successful_poll_timestamp_seconds` | gauge | Unix timestamp of the last successful Horizon poll or stream event |
+| `GalaxyRay_horizon_cursor_age_seconds` | gauge | Age of the most recently processed Horizon payment record — the sharpest signal of payment-detection lag |
+| `GalaxyRay_http_requests_total` | counter | HTTP requests, labelled by `method`, matched `route` (never the raw path — bounded cardinality), and `status` |
+| `GalaxyRay_http_request_duration_seconds` | histogram | HTTP request latency, labelled by `method` and matched `route` |
+| `GalaxyRay_payments_total` | counter | Payments labelled by lifecycle `status` (`created`, `completed`, `overpaid`, `underpaid`, `expired`) |
+| `GalaxyRay_payment_settlement_latency_seconds` | histogram | Time from payment creation to a settlement outcome |
+| `GalaxyRay_db_pool_connections` | gauge | SQLite connection pool size, labelled by `state` (`idle`, `in_use`) |
+| `GalaxyRay_db_pool_max_connections` | gauge | Configured maximum pool size |
+| `GalaxyRay_db_file_size_bytes` | gauge | On-disk size of the SQLite database files, labelled by `file` (`main`, `wal`, `shm`); absent for an in-memory database |
+| `GalaxyRay_missing_trustlines` | gauge | `1` if the gateway account has no usable trustline for this asset (absent or unauthorized); `0` if confirmed usable |
+| `GalaxyRay_trustline_unauthorized` | gauge | `1` if the trustline exists but `is_authorized=false` (issuer revoked/has not granted authorization) |
+| `GalaxyRay_trustline_headroom_stroops` | gauge | Remaining trustline capacity in stroops (`limit - balance`); alert when near your typical payment size |
+| `GalaxyRay_trustline_check_failures_total` | counter | Trustline checks that failed to reach Horizon (does not affect `GalaxyRay_missing_trustlines`) |
+| `GalaxyRay_trustline_check_last_success_timestamp_seconds` | gauge | Unix timestamp of the last confirmed trustline check; `0` until first success |
 
-**Alert on `stellargate_tasks_live < stellargate_tasks_expected`.** That
-comparison was not previously possible: `stellargate_tasks_stopped_total` was
+**Alert on `GalaxyRay_tasks_live < GalaxyRay_tasks_expected`.** That
+comparison was not previously possible: `GalaxyRay_tasks_stopped_total` was
 overloaded across clean shutdown, configuration-disabled exit and fault, so
 `started − stopped − failed` was not a live count and there was nothing to
-compare it against. `stellargate_task_disabled` is what separates "switched off
-on purpose" from "not running", which `stellargate_task_running` alone reports
+compare it against. `GalaxyRay_task_disabled` is what separates "switched off
+on purpose" from "not running", which `GalaxyRay_task_running` alone reports
 identically.
 
 Structured logs (via `tracing`) carry a `request_id` field on every request span, matching the `x-request-id` response header returned to clients. Every log line emitted during a request — including internal errors (`AppError`), audit events, and auth denials — inherits `request_id` automatically from the span context. Operators can search logs directly using the request ID returned in response headers:
 
 ```bash
 # Filter JSON logs by request ID quoted by a client:
-jq 'select(.request_id == "7f3a...")' /var/log/stellargate.log
+jq 'select(.request_id == "7f3a...")' /var/log/GalaxyRay.log
 
 # Grep structured text logs by request ID:
-grep 'request_id=7f3a...' /var/log/stellargate.log
+grep 'request_id=7f3a...' /var/log/GalaxyRay.log
 ```
 
 Settlement logs include `settlement_latency_secs`, and both listeners log `cursor_age_secs` so poller lag is visible before a merchant notices.
 
-Control verbosity with `RUST_LOG`, e.g. `RUST_LOG=stellargate=debug,tower_http=debug`.
+Control verbosity with `RUST_LOG`, e.g. `RUST_LOG=GalaxyRay=debug,tower_http=debug`.
 
 ### Audit events
 
@@ -1624,14 +1624,14 @@ unchanged on any VPS, home server, or Raspberry Pi.
 
 ```bash
 # On the VM — installs Docker, opens the host firewall, adds a systemd unit
-curl -fsSL https://raw.githubusercontent.com/StellarGateLabs/StellarGate/main/deploy/setup-oracle.sh | bash
+curl -fsSL https://raw.githubusercontent.com/GalaxyRayLabs/GalaxyRay/main/deploy/setup-oracle.sh | bash
 
-cd ~/StellarGate
-cp deploy/stellargate.env.example deploy/stellargate.env
-chmod 600 deploy/stellargate.env
-nano deploy/stellargate.env          # domain, Stellar account, secrets
+cd ~/GalaxyRay
+cp deploy/GalaxyRay.env.example deploy/GalaxyRay.env
+chmod 600 deploy/GalaxyRay.env
+nano deploy/GalaxyRay.env          # domain, Stellar account, secrets
 
-sudo systemctl start stellargate
+sudo systemctl start GalaxyRay
 curl https://your-domain.com/health
 ```
 
@@ -1707,7 +1707,7 @@ Integration tests run against an in-memory SQLite database and a [wiremock](http
 
 ## Contributing
 
-Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the PR process; participation is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). Scoped, ready-to-pick-up issues are tracked in the [issue list](https://github.com/StellarGateLabs/StellarGate/issues).
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the PR process; participation is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). Scoped, ready-to-pick-up issues are tracked in the [issue list](https://github.com/GalaxyRayLabs/GalaxyRay/issues).
 
 1. Fork the repository
 2. Branch: `git checkout -b feat/your-feature`

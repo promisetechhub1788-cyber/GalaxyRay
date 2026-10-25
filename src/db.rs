@@ -1,4 +1,4 @@
-use anyhow::Result;
+﻿use anyhow::Result;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
 use sqlx::{Pool, Row, Sqlite};
 use std::str::FromStr;
@@ -169,7 +169,7 @@ pub async fn migrate(pool: &Db) -> Result<()> {
 
     /* Bring pre-existing delivery tables up to schema. `event_type` records
     which event the payload represents so a redelivery can echo the original
-    `X-StellarGate-Event` header instead of guessing. Rows written before this
+    `X-GalaxyRay-Event` header instead of guessing. Rows written before this
     column existed stay NULL; readers fall back to the `event` field inside the
     stored payload. */
     let has_event_type: i64 = sqlx::query_scalar(
@@ -1025,7 +1025,7 @@ pub async fn memo_exists(pool: &Db, memo: &str) -> Result<bool> {
 
 /// Record an outbound webhook delivery. `event_type` is the event name the
 /// payload carries (e.g. `payment.underpaid`); it is persisted so a later
-/// redelivery can reproduce the original `X-StellarGate-Event` header.
+/// redelivery can reproduce the original `X-GalaxyRay-Event` header.
 pub async fn save_webhook_delivery(
     pool: &Db,
     id: &str,
@@ -1236,7 +1236,7 @@ fn sqlite_path(database_url: &str) -> Option<&str> {
 }
 
 /// Sizes, in bytes, of the main database file and its `-wal`/`-shm`
-/// companions, for the `stellargate_db_file_size_bytes` gauge (issue: missing
+/// companions, for the `GalaxyRay_db_file_size_bytes` gauge (issue: missing
 /// DB metrics). Each is `None` when the file doesn't exist yet (a `-wal`
 /// before the first write, or any of them for an in-memory database) rather
 /// than an error — a fresh deployment legitimately has no WAL file.
@@ -2249,7 +2249,7 @@ mod tests {
     fn file_sizes_reports_the_main_file_and_absent_wal_shm() {
         let contents = b"pretend sqlite header bytes";
         let path =
-            std::env::temp_dir().join(format!("stellargate-metrics-test-{}", uuid::Uuid::new_v4()));
+            std::env::temp_dir().join(format!("GalaxyRay-metrics-test-{}", uuid::Uuid::new_v4()));
         std::fs::write(&path, contents).unwrap();
 
         let url = format!("sqlite:{}", path.display());

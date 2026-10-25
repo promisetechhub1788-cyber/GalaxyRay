@@ -1,15 +1,15 @@
-# Security Policy
+﻿# Security Policy
 
 _Last reviewed: 2026-08-29_
 
-StellarGate handles Stellar-network payments — destination addresses, memos,
+GalaxyRay handles Stellar-network payments — destination addresses, memos,
 webhook secrets, and (in self-hosted deployments) gateway wallet keys.
 Vulnerabilities here can have direct financial impact, so we ask that you
 report them privately rather than through a public GitHub issue.
 
 ## Supported Versions
 
-StellarGate is pre-1.0 and does not yet maintain parallel release branches.
+GalaxyRay is pre-1.0 and does not yet maintain parallel release branches.
 Security fixes are made against the `main` branch only. Deployments should
 track `main` (or the latest tagged release, once releases exist) to receive
 fixes. The minimum supported Rust version is **1.94** (see `rust-toolchain.toml`).
@@ -27,13 +27,13 @@ Public disclosure before a fix is available puts every deployment at risk.
 Instead, report privately using one of these channels:
 
 1. **Preferred: GitHub Private Vulnerability Reporting.**
-   Go to the [Security tab](https://github.com/StellarGateLabs/StellarGate/security/advisories/new)
+   Go to the [Security tab](https://github.com/GalaxyRayLabs/GalaxyRay/security/advisories/new)
    of this repository and open a new draft security advisory. This notifies
    maintainers directly without making the report public, and lets us
    collaborate with you on a fix (including credit in the advisory, if
    desired) before disclosure.
 2. **Alternative: email.** If you're unable to use GitHub's advisory flow,
-   email the maintainers at **security@stellargatelabs.com** with a description
+   email the maintainers at **security@GalaxyRaylabs.com** with a description
    of the issue, steps to reproduce, and any proof-of-concept code. If you
    don't receive a response within 72 hours, please follow up — email can
    be missed.
@@ -61,7 +61,7 @@ Please include as much of the following as you can:
 
 In scope:
 
-- The StellarGate API server (`src/`), including payment creation/lookup,
+- The GalaxyRay API server (`src/`), including payment creation/lookup,
   webhook signing and delivery, the Horizon listener/poller, merchant
   provisioning, and configuration/validation logic.
 - The database schema and migrations (`db::migrate` in `src/db.rs` — there is no `migrations/` directory).
@@ -106,7 +106,7 @@ Every admin action emits exactly one `audit = true` event carrying
 
 ## Known Security Design Notes
 
-For context when triaging reports, StellarGate already implements:
+For context when triaging reports, GalaxyRay already implements:
 
 - HMAC-SHA256 request signing on outbound webhooks with a signed timestamp
   (replay-resistant); see the "Verifying webhooks" section of the
@@ -121,7 +121,7 @@ For context when triaging reports, StellarGate already implements:
   when `ADMIN_PROVISIONING_SECRET` is unset.
 - **`webhook_url` is treated as a secret.** Webhook endpoint URLs commonly
   embed capability tokens in the path or query string (e.g.
-  `https://hooks.example.com/t/SecretToken`). StellarGate never logs the
+  `https://hooks.example.com/t/SecretToken`). GalaxyRay never logs the
   full URL; log statements redact it to scheme and host only
   (`https://hooks.example.com/…`) so the credential is not copied into log
   sinks, aggregators, or support tickets (issue #240).

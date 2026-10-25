@@ -1,4 +1,4 @@
-/* Session store: the API-key storage rules from #252.
+﻿/* Session store: the API-key storage rules from #252.
  *
  * The merchant's API key lives in the browser only. "Remember me" keeps it in
  * localStorage (survives reloads); otherwise it lives in sessionStorage (tab
@@ -8,8 +8,8 @@
  * DOM-free so it runs under `node --test` (issue #723).
  */
 
-export const KEY_NAME = "stellargate.apiKey";
-export const KEY_SAVED_AT = "stellargate.apiKeySavedAt";
+export const KEY_NAME = "GalaxyRay.apiKey";
+export const KEY_SAVED_AT = "GalaxyRay.apiKeySavedAt";
 export const SESSION_TTL_MS = 30 * 60 * 1000;
 
 const KEY_TTL_MS = 7 * 24 * 60 * 60 * 1000;

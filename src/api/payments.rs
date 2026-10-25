@@ -1,4 +1,4 @@
-use crate::{AppState, api::AuthenticatedMerchant, db, money};
+﻿use crate::{AppState, api::AuthenticatedMerchant, db, money};
 use axum::{
     Json,
     extract::{
@@ -773,7 +773,7 @@ pub async fn redeliver_webhook(
     /* Re-send the original payload, re-signed with a fresh timestamp so the
     receiver's replay-tolerance window is measured from this redelivery. The
     event header comes from the stored delivery rather than being hard-coded:
-    a receiver that routes on `X-StellarGate-Event` must see the same event the
+    a receiver that routes on `X-GalaxyRay-Event` must see the same event the
     body carries, whether that was completed, overpaid, underpaid, or expired. */
     let payload_bytes = delivery.payload.as_bytes();
     let timestamp = crate::webhook::current_timestamp();
@@ -783,12 +783,12 @@ pub async fn redeliver_webhook(
     let result = client
         .post(&delivery.url)
         .header("Content-Type", "application/json")
-        .header("X-StellarGate-Signature", &signature)
-        .header("X-StellarGate-Timestamp", timestamp.to_string())
+        .header("X-GalaxyRay-Signature", &signature)
+        .header("X-GalaxyRay-Timestamp", timestamp.to_string())
         // Convenience header — mirrors the `event` field already present in
         // the signed body. NOT covered by the HMAC; receivers must route on
         // the authenticated body field, not this header.
-        .header("X-StellarGate-Event", &event)
+        .header("X-GalaxyRay-Event", &event)
         .body(delivery.payload.clone())
         .send()
         .await;
