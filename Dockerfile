@@ -1,4 +1,4 @@
-﻿# Base images are pinned by digest so silent upstream updates cannot change the
+# Base images are pinned by digest so silent upstream updates cannot change the
 # build. Keep the rust tag in sync with rust-toolchain.toml / Cargo.toml MSRV.
 # To refresh a pin:
 #   docker buildx imagetools inspect rust:1.94-bookworm --format '{{.Manifest.Digest}}'
@@ -25,7 +25,7 @@ COPY . .
 RUN cargo build --release --locked
 
 # ── Stage 2: slim runtime image ───────────────────────────────────────────────
-FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 AS runtime
+FROM debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8 AS runtime
 
 LABEL org.opencontainers.image.description="Non-custodial payment gateway API for accepting and settling payments on the Stellar network"
 
