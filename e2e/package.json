@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "GalaxyRay-dashboard-e2e",
   "version": "0.0.0",
   "private": true,
@@ -11,6 +11,6 @@
     "seed": "node fixtures/seed.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0"
+    "@playwright/test": "^1.64.1"
   }
 }
