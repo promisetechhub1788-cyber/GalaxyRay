@@ -1,12 +1,12 @@
 ﻿[package]
 name = "galaxyray"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 rust-version = "1.94"
 
 description = "Non-custodial payment gateway API for accepting and settling payments on the Stellar network"
-repository = "https://github.com/StellarGateLabs/StellarGate"
-homepage = "https://github.com/StellarGateLabs/StellarGate"
+repository = "https://github.com/promisetechhub1788-cyber/GalaxyRay"
+homepage = "https://github.com/promisetechhub1788-cyber/GalaxyRay"
 readme = "README.md"
 license = "MIT"
 keywords = ["stellar", "payments", "payment-gateway", "webhooks", "xlm"]
