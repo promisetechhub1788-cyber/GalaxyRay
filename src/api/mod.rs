@@ -1,4 +1,4 @@
-﻿use crate::api::payments::{AppError, JsonBody};
+use crate::api::payments::{AppError, JsonBody};
 use crate::{AppState, db};
 use axum::{
     Json,
@@ -27,8 +27,6 @@ use tower_http::{
 };
 
 mod payments;
-mod analytics;
-mod invoices;
 mod subscriptions;
 
 /// Reject request bodies larger than this (256 KiB) before they hit a handler.

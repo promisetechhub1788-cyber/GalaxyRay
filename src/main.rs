@@ -1,20 +1,20 @@
-﻿//! GalaxyRay binary entry point: boots configuration, storage and HTTP
+//! GalaxyRay binary entry point: boots configuration, storage and HTTP
 //! clients, spawns the background listeners, serves the API, and drains
 //! everything on shutdown.
 
 use anyhow::Result;
-use std::net::SocketAddr;
-use std::sync::Arc;
-use std::time::Duration;
 use galaxyray::{
-    AppState, TaskHealth, api,
+    api,
     config::{Config, ListenerMode},
     db, expiry, horizon,
     metrics::{
         AuthMetrics, HorizonMetrics, HttpMetrics, PaymentMetrics, TrustlineMetrics, WebhookMetrics,
     },
-    retention, subscriptions, supervise, webhook,
+    retention, subscriptions, supervise, webhook, AppState, TaskHealth,
 };
+use std::net::SocketAddr;
+use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::watch;
 use tokio::task::JoinHandle;
 use tracing::{info, warn};
@@ -279,11 +279,11 @@ async fn report_trustlines(state: &Arc<AppState>) {
 /// itself panicked, which is recorded so the failure counter — and any alert
 /// watching it — fires.
 async fn join_task(handle: JoinHandle<()>, name: &'static str, health: &TaskHealth) {
-    if let Err(e) = handle.await
-        && e.is_panic()
-    {
-        warn!("background task panicked");
-        health.task_failed(name);
+    if let Err(e) = handle.await {
+        if e.is_panic() {
+            warn!("background task panicked");
+            health.task_failed(name);
+        }
     }
 }
 
@@ -343,13 +343,7 @@ mod tests {
 
     #[test]
     fn healthcheck_url_falls_back_to_default_path() {
-        assert_eq!(
-            healthcheck_url(3000, ""),
-            "http://127.0.0.1:3000/health"
-        );
-        assert_eq!(
-            healthcheck_url(3000, "/"),
-            "http://127.0.0.1:3000/health"
-        );
+        assert_eq!(healthcheck_url(3000, ""), "http://127.0.0.1:3000/health");
+        assert_eq!(healthcheck_url(3000, "/"), "http://127.0.0.1:3000/health");
     }
 }

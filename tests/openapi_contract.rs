@@ -1,4 +1,4 @@
-﻿//! Contract guard: keeps `openapi.yaml` honest against the real router.
+//! Contract guard: keeps `openapi.yaml` honest against the real router.
 //!
 //! This is the CI cross-check issue #298 asks for — a test that "fails when the
 //! documented paths diverge from the router". It bridges three things:
@@ -21,16 +21,16 @@
 
 use axum::http::{Method, StatusCode};
 use axum_test::{TestResponse, TestServer};
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
 use serde_json::Value;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::collections::BTreeSet;
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 
 const TEST_ADMIN_SECRET: &str = "test-admin-secret";
 
@@ -196,10 +196,10 @@ fn documented_paths(spec: &str) -> BTreeSet<String> {
         if let Some(rest) = line.strip_prefix("  ") {
             // Exactly two-space indent -> a path key. Deeper keys start with a
             // space here and are skipped; comments don't start with '/'.
-            if rest.starts_with('/')
-                && let Some(key) = rest.strip_suffix(':')
-            {
-                out.insert(key.trim_end().to_string());
+            if rest.starts_with('/') {
+                if let Some(key) = rest.strip_suffix(':') {
+                    out.insert(key.trim_end().to_string());
+                }
             }
         }
     }
