@@ -37,7 +37,7 @@ RUN useradd -r -u 1001 -U GalaxyRay \
     && mkdir /data \
     && chown GalaxyRay:GalaxyRay /data
 
-COPY --from=builder /app/target/release/GalaxyRay /usr/local/bin/GalaxyRay
+COPY --from=builder /app/target/release/galaxyray /usr/local/bin/galaxyray
 
 USER GalaxyRay
 
@@ -49,6 +49,6 @@ EXPOSE 3000
 # runtime image needs no HTTP client of its own. Compose files can override
 # `test:` to point at a different path (e.g. `/ready`) or timing.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["/usr/local/bin/GalaxyRay", "healthcheck", "health"]
+    CMD ["/usr/local/bin/galaxyray", "healthcheck", "health"]
 
-CMD ["/usr/local/bin/GalaxyRay"]
+CMD ["/usr/local/bin/galaxyray"]

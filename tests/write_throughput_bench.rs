@@ -1,4 +1,4 @@
-﻿//! Measured write-throughput ceiling for the single-writer SQLite setup
+//! Measured write-throughput ceiling for the single-writer SQLite setup
 //! (issue #321). Not run in CI — `#[ignore]`d, and deliberately not part of
 //! `cargo test --locked`'s default set, since it measures wall-clock
 //! performance rather than correctness and its number is only meaningful
@@ -23,10 +23,10 @@
 //! settlement, webhook delivery bookkeeping, `last_used_at`) goes through the
 //! same single-writer lock this measures.
 
-use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant};
 use galaxyray::db::{self, NewPayment};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 const CONCURRENCY: usize = 16;
 const DURATION: Duration = Duration::from_secs(10);

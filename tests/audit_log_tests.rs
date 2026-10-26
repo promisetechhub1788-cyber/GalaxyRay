@@ -1,4 +1,4 @@
-﻿//! Regression coverage for issue #305: state-changing operations must emit
+//! Regression coverage for issue #305: state-changing operations must emit
 //! a structured audit event carrying `audit=true`, an `action`, an `outcome`,
 //! the acting merchant (or admin), a `source_ip`, and a `request_id`.
 //!
@@ -7,15 +7,15 @@
 
 use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 use tracing_test::traced_test;
 
 const TEST_ADMIN_SECRET: &str = "test-admin-secret";

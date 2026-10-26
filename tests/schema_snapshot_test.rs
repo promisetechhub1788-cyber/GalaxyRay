@@ -1,4 +1,4 @@
-﻿//! Asserts a freshly `db::migrate`d database matches the checked-in schema
+//! Asserts a freshly `db::migrate`d database matches the checked-in schema
 //! snapshot at `tests/schema_snapshot.sql` (issue #308).
 //!
 //! `db::migrate` (in `src/db.rs`) is the only schema definition that
@@ -14,9 +14,9 @@
 //! with `--nocapture` — on a mismatch it prints the freshly generated
 //! snapshot text so it can be pasted directly into `tests/schema_snapshot.sql`.
 
+use galaxyray::db;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
-use galaxyray::db;
 
 const SNAPSHOT: &str = include_str!("schema_snapshot.sql");
 

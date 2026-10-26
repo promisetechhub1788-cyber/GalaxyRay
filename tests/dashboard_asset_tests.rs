@@ -1,4 +1,4 @@
-﻿//! Dashboard asset checks.
+//! Dashboard asset checks.
 //!
 //! The static checks below inspect the compiled-in JS directly; the router
 //! checks serve each asset through the real `api::router` so a response-builder
@@ -6,14 +6,14 @@
 //! content type or the Content-Security-Policy fails CI.
 
 use axum_test::TestServer;
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 
 const HTML: &str = include_str!("../static/dashboard.html");
 const CSS: &str = include_str!("../static/dashboard.css");
@@ -491,7 +491,10 @@ fn every_dashboard_helper_the_script_calls_is_defined() {
 
 #[test]
 fn dashboard_print_styles_hide_chrome_and_keep_table_readable() {
-    assert!(DASHBOARD_CSS.contains("@media print"), "print styles must be defined");
+    assert!(
+        DASHBOARD_CSS.contains("@media print"),
+        "print styles must be defined"
+    );
     for needle in [
         ".topbar,",
         ".toolbar,",

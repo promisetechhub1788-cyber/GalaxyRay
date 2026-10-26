@@ -1,4 +1,4 @@
-﻿//! Regression tests for multi-operation silent underpayment drop
+//! Regression tests for multi-operation silent underpayment drop
 //! (issues #614, #615, #616).
 //!
 //! ## The bug
@@ -33,17 +33,17 @@
 
 use std::sync::Arc;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db::{self, NewPayment},
-    horizon::{HorizonPayment, TransactionRef, reconcile_payment},
+    horizon::{reconcile_payment, HorizonPayment, TransactionRef},
+    AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use std::str::FromStr;
 use wiremock::{
-    Mock, MockServer, ResponseTemplate,
     matchers::{method, path},
+    Mock, MockServer, ResponseTemplate,
 };
 
 // ── helpers ──────────────────────────────────────────────────────────────────

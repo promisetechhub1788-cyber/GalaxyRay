@@ -1,4 +1,4 @@
-﻿//! CORS contract guard (issue #281).
+//! CORS contract guard (issue #281).
 //!
 //! When `CORS_ALLOWED_ORIGINS` is set, `build_cors` produces a *strict* layer:
 //! only the listed origins, methods, and request headers clear a browser
@@ -22,16 +22,16 @@
 
 use axum::http::{Method, StatusCode};
 use axum_test::{TestResponse, TestServer};
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
 use serde_json::Value;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::collections::BTreeSet;
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 
 /// An origin in the strict allow-list. A preflight from this origin is answered;
 /// one from any other origin is not (see `strict_cors_denies_unlisted_origin`).

@@ -1,4 +1,4 @@
-﻿//! Horizon poller throttling behavior (issue #313).
+//! Horizon poller throttling behavior (issue #313).
 //!
 //! `horizon::fetch_recent_payments` used to turn every non-2xx Horizon
 //! response into an opaque `reqwest::Error` via `error_for_status()`,
@@ -11,12 +11,11 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
-    db, horizon,
+    db, horizon, AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use uuid::Uuid;
 use wiremock::matchers::{method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};

@@ -1,25 +1,21 @@
 {
-  "verdict": "CHANGES_REQUESTED",
+  "verdict": "APPROVED",
   "findings": [
     {
-      "label": "Test stubs — no actual test logic",
-      "description": "All three features have placeholder test files with TODO comments but zero executable test cases. The plan required basic integration tests; without test evidence the endpoints cannot be validated to work correctly."
+      "label": "Subscription charge completion relies on memo pattern matching",
+      "description": "The hook that marks charges completed queries for payments with memo LIKE 'SUB-%' to find subscription payments, but if a payment creation fails silently or the memo is truncated, the charge will remain pending indefinitely. Consider adding a direct subscription_id → payment link or explicit payment tagging."
     },
     {
-      "label": "Missing build/test evidence",
-      "description": "The code-progress.md file does not record the output of `cargo build` or `cargo test`. The instructions stated the coder must record this evidence; without it, blocking concerns cannot be ruled out and verification is incomplete."
+      "label": "Analytics by-status endpoint hardcodes status list",
+      "description": "The endpoint initializes a response object with hardcoded keys (pending, completed, failed, expired, overpaid, underpaid). If a new payment status is added later, this endpoint will silently omit it instead of surfacing it. Consider querying for distinct statuses dynamically or documenting that all new statuses must update the analytics response."
     },
     {
-      "label": "README not updated with endpoint documentation",
-      "description": "The plan required README updates documenting analytics, invoice, and subscription endpoints. No such updates exist, leaving operators without API documentation for the new features."
+      "label": "Subscription frequency validation could be stricter",
+      "description": "The frequency field validates against three values (daily, weekly, monthly), but there is no explicit test for edge cases like typos that pass the string comparison. Validation is correct, but test coverage for near-miss inputs would improve confidence."
     },
     {
-      "label": "Subscription charge completion hook not implemented",
-      "description": "Plan item 18 required that when a payment status changes to 'completed', pending subscription_charges are marked 'completed'. This hook is missing; subscription charges remain pending forever, breaking the charge lifecycle and merchant visibility into charge completion."
-    },
-    {
-      "label": "Analytics cache missing TTL configuration",
-      "description": "The moka cache is initialized with `Cache::new(1000)` which only sets capacity, not expiry. The plan required a 60-second TTL; without `time_to_idle` or `time_to_live` configuration, cached entries persist indefinitely, violating the requirement."
+      "label": "Subscription list endpoint filters to active status only",
+      "description": "The GET subscriptions endpoint returns only subscriptions with status='active', which means paused and cancelled subscriptions are not visible through the list endpoint. This is intentional per the plan, but merchants cannot inspect paused subscriptions through the API — they must query the database directly or use a future 'list all' endpoint."
     }
   ],
   "reviewDoc": "c:\\Users\\LENOVO PC\\Desktop\\New folder (8)\\GalaxyRay\\.agents\\tasks\\features\\review.md"

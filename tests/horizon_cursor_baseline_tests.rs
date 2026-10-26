@@ -1,4 +1,4 @@
-﻿//! First-run Horizon cursor baselining (issue #311).
+//! First-run Horizon cursor baselining (issue #311).
 //!
 //! `starting_cursor` used to baseline a brand-new deployment at the account's
 //! single most recent payment (`order=desc&limit=1`), adopting its paging
@@ -19,12 +19,11 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
-    db, horizon,
+    db, horizon, AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 const GATEWAY: &str = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";

@@ -1,4 +1,4 @@
-﻿//! Regression tests for multi-operation transaction under-credit (issue #613).
+//! Regression tests for multi-operation transaction under-credit (issue #613).
 //!
 //! ## The bug
 //!
@@ -35,17 +35,17 @@
 
 use std::sync::Arc;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db::{self, NewPayment},
-    horizon::{HorizonPayment, TransactionRef, reconcile_payment},
+    horizon::{reconcile_payment, HorizonPayment, TransactionRef},
+    AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use std::str::FromStr;
 use wiremock::{
-    Mock, MockServer, ResponseTemplate,
     matchers::{method, path},
+    Mock, MockServer, ResponseTemplate,
 };
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -199,8 +199,8 @@ async fn delivered_events(mock_server: &MockServer) -> Vec<String> {
         .unwrap()
         .iter()
         .map(|req| {
-            serde_json::from_slice::<serde_json::Value>(&req.body)
-                .expect("webhook body is JSON")["event"]
+            serde_json::from_slice::<serde_json::Value>(&req.body).expect("webhook body is JSON")
+                ["event"]
                 .as_str()
                 .expect("every payload carries an event")
                 .to_string()

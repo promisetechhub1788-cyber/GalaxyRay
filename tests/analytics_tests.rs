@@ -1,14 +1,10 @@
 use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{api, config::Config, db, AppState};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::Config,
-    db,
-};
 
 fn make_config() -> Config {
     Config {

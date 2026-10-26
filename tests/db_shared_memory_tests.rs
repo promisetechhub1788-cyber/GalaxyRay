@@ -1,4 +1,4 @@
-﻿//! Proves the shared-cache in-memory SQLite fixture used across this suite
+//! Proves the shared-cache in-memory SQLite fixture used across this suite
 //! (issue #309) is genuinely shared across pooled connections — not merely
 //! passing by connection-reuse luck the way a bare `sqlite::memory:` DSN did.
 //!
@@ -13,10 +13,10 @@
 //! `min_connections(1)` everywhere this DSN is used — SQLite drops a
 //! shared-cache in-memory database once every connection to it closes).
 
-use sqlx::Connection;
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
 use galaxyray::db;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use sqlx::Connection;
+use std::str::FromStr;
 
 /// Two connections drawn from a shared-cache pool must see each other's
 /// writes: a row inserted through one connection is immediately visible

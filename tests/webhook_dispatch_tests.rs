@@ -1,21 +1,20 @@
-﻿//! Integration tests for `webhook::dispatch` against a mock HTTP server.
+//! Integration tests for `webhook::dispatch` against a mock HTTP server.
 //!
 //! Covers request construction (signature header), retry-then-success, and
 //! exhausted-retries paths, asserting both the requests the mock server
 //! received and the resulting `webhook_deliveries` row.
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::time::Duration;
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db,
     horizon::{self, HorizonPayment, TransactionRef},
-    webhook,
+    webhook, AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use std::str::FromStr;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
+use std::time::Duration;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 

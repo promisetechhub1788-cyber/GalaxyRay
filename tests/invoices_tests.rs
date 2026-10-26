@@ -1,14 +1,10 @@
 use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{api, config::Config, db, AppState};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::Config,
-    db,
-};
 
 fn make_config() -> Config {
     Config {
@@ -107,7 +103,7 @@ async fn test_create_invoice() {
         .add_header("Authorization", &auth)
         .json(&payload)
         .await;
-    
+
     res.assert_status(StatusCode::CREATED);
     let body = res.json::<Value>();
     assert_eq!(body["invoice_number"].as_str().unwrap(), "1");
@@ -182,12 +178,18 @@ async fn test_update_invoice_status() {
         .json(&payload)
         .await;
 
-    let invoice_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let invoice_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Update status to sent
     let update_payload = json!({ "status": "sent" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/invoices/{}", invoice_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/invoices/{}",
+            invoice_id
+        ))
         .add_header("Authorization", &auth)
         .json(&update_payload)
         .await;
@@ -199,7 +201,10 @@ async fn test_update_invoice_status() {
     // Update status to paid
     let update_payload = json!({ "status": "paid" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/invoices/{}", invoice_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/invoices/{}",
+            invoice_id
+        ))
         .add_header("Authorization", &auth)
         .json(&update_payload)
         .await;
@@ -229,12 +234,18 @@ async fn test_invalid_invoice_status_returns_400() {
         .json(&payload)
         .await;
 
-    let invoice_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let invoice_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Try invalid status
     let update_payload = json!({ "status": "invalid_status" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/invoices/{}", invoice_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/invoices/{}",
+            invoice_id
+        ))
         .add_header("Authorization", &auth)
         .json(&update_payload)
         .await;
@@ -264,14 +275,20 @@ async fn test_invoice_merchant_isolation() {
         .json(&payload)
         .await;
 
-    let invoice_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let invoice_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Provision second merchant and try to access first merchant's invoice
     let api_key_2 = provision_merchant(&server).await;
     let auth_2 = format!("Bearer {}", api_key_2);
 
     let res = server
-        .get(&format!("/v1/merchants/test-merchant/invoices/{}", invoice_id))
+        .get(&format!(
+            "/v1/merchants/test-merchant/invoices/{}",
+            invoice_id
+        ))
         .add_header("Authorization", &auth_2)
         .await;
 

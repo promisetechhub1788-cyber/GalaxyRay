@@ -3,7 +3,6 @@
 //! everything on shutdown.
 
 use anyhow::Result;
-use std::future::Future;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -16,8 +15,6 @@ use galaxyray::{
     },
     retention, subscriptions, supervise, webhook,
 };
-use moka::sync::Cache;
-use std::time::Duration;
 use tokio::sync::watch;
 use tokio::task::JoinHandle;
 use tracing::{info, warn};
@@ -152,6 +149,13 @@ async fn main() -> Result<()> {
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     info!("GalaxyRay API listening on {addr}");
 
+    // Load shutdown grace period from environment or use default
+    let shutdown_grace_secs = std::env::var("SHUTDOWN_GRACE_SECS")
+        .ok()
+        .and_then(|s| s.parse::<u64>().ok())
+        .unwrap_or(DEFAULT_SHUTDOWN_GRACE_SECS);
+    let shutdown_grace = Duration::from_secs(shutdown_grace_secs);
+
     // One overall deadline covers both the HTTP drain and the worker drain, so
     // the process can never overrun the orchestrator's stop grace period.
     let deadline = tokio::time::Instant::now() + shutdown_grace;
@@ -190,7 +194,7 @@ async fn main() -> Result<()> {
     };
 
     if tokio::time::timeout_at(deadline, shutdown).await.is_err() {
-        let running = health.running_tasks();
+        let running = health.dead_required_tasks();
         warn!(
             timeout_secs = shutdown_grace.as_secs(),
             ?running,

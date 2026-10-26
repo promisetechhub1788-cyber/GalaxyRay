@@ -1,14 +1,14 @@
-﻿use axum::http::StatusCode;
+use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 use time::format_description::well_known::Rfc3339;
 
 fn make_config() -> Config {
@@ -652,12 +652,10 @@ async fn test_webhook_url_http_rejected_on_public_network() {
     res.assert_status(StatusCode::BAD_REQUEST);
     let body: Value = res.json();
     assert_eq!(body["code"], "invalid_webhook_url");
-    assert!(
-        body["error"]
-            .as_str()
-            .unwrap()
-            .contains("must be an HTTPS URL on public network")
-    );
+    assert!(body["error"]
+        .as_str()
+        .unwrap()
+        .contains("must be an HTTPS URL on public network"));
 }
 
 #[tokio::test]

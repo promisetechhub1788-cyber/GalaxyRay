@@ -1,20 +1,20 @@
-﻿//! Rate-limit behaviour lives in its own integration binary on purpose.
+//! Rate-limit behaviour lives in its own integration binary on purpose.
 //!
 //! The broader API tests run at a high limit and exercise merchant auth heavily.
 //! Keeping the low-quota assertion here makes the expected 429 path explicit.
 
 use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{
+    api,
+    config::{Config, ListenerMode},
+    db, AppState,
+};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::future::IntoFuture;
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::{Config, ListenerMode},
-    db,
-};
 
 fn make_config(rate_limit_requests_per_sec: u32) -> Config {
     Config {

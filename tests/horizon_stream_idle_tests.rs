@@ -1,4 +1,4 @@
-﻿//! Horizon SSE stream idle-timeout behavior (issue #312).
+//! Horizon SSE stream idle-timeout behavior (issue #312).
 //!
 //! `stream_once` used to await `stream.next()` with nothing bounding it, so a
 //! half-open connection — one that stops delivering bytes without closing,
@@ -16,16 +16,15 @@
 //! `HorizonMetrics` and exported by `metrics::render`.
 
 use std::str::FromStr;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::time::Duration;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
-    db, horizon,
+    db, horizon, AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio::sync::watch;

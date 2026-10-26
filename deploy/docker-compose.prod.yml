@@ -49,7 +49,7 @@ services:
       # exempt from the per-IP rate limiter (see DEPLOYMENT.md), so a traffic
       # spike can never turn this into a 429 and get the container restarted.
       # The binary checks its own health, so no HTTP client is needed in the image.
-      test: ["CMD", "/usr/local/bin/GalaxyRay", "healthcheck", "ready"]
+      test: ["CMD", "/usr/local/bin/galaxyray", "healthcheck", "ready"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -1,4 +1,4 @@
-﻿//! Startup trustline check (issue #116).
+//! Startup trustline check (issue #116).
 //!
 //! `horizon::check_trustlines` queries Horizon for the gateway account's
 //! balances and surfaces any accepted asset the account has no trustline for —
@@ -8,12 +8,11 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
-    db, horizon,
+    db, horizon, AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 

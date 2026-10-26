@@ -16,6 +16,9 @@
 
 set -euo pipefail
 
+# Logging function for informational messages
+note() { echo "$@" >&2; }
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 caddyfile="$repo_root/deploy/Caddyfile"
 api_mod="$repo_root/src/api/mod.rs"

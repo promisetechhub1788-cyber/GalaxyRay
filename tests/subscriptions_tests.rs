@@ -1,14 +1,10 @@
 use axum::http::StatusCode;
 use axum_test::TestServer;
-use serde_json::{Value, json};
+use galaxyray::{api, config::Config, db, AppState};
+use serde_json::{json, Value};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
-use galaxyray::{
-    AppState, api,
-    config::Config,
-    db,
-};
 
 fn make_config() -> Config {
     Config {
@@ -214,12 +210,18 @@ async fn test_pause_subscription() {
         .json(&payload)
         .await;
 
-    let sub_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let sub_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Pause subscription
     let update_payload = json!({ "status": "paused" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/subscriptions/{}", sub_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/subscriptions/{}",
+            sub_id
+        ))
         .add_header("Authorization", &auth)
         .json(&update_payload)
         .await;
@@ -249,12 +251,18 @@ async fn test_resume_subscription() {
         .json(&payload)
         .await;
 
-    let sub_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let sub_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Pause subscription
     let pause_payload = json!({ "status": "paused" });
     server
-        .patch(&format!("/v1/merchants/test-merchant/subscriptions/{}", sub_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/subscriptions/{}",
+            sub_id
+        ))
         .add_header("Authorization", &auth)
         .json(&pause_payload)
         .await
@@ -263,7 +271,10 @@ async fn test_resume_subscription() {
     // Resume subscription
     let resume_payload = json!({ "status": "active" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/subscriptions/{}", sub_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/subscriptions/{}",
+            sub_id
+        ))
         .add_header("Authorization", &auth)
         .json(&resume_payload)
         .await;
@@ -293,12 +304,18 @@ async fn test_cancel_subscription() {
         .json(&payload)
         .await;
 
-    let sub_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let sub_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Cancel subscription
     let cancel_payload = json!({ "status": "cancelled" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/subscriptions/{}", sub_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/subscriptions/{}",
+            sub_id
+        ))
         .add_header("Authorization", &auth)
         .json(&cancel_payload)
         .await;
@@ -329,7 +346,10 @@ async fn test_subscription_merchant_isolation() {
         .json(&payload)
         .await;
 
-    let sub_id = create_res.json::<Value>()["id"].as_str().unwrap().to_string();
+    let sub_id = create_res.json::<Value>()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Provision second merchant and try to access first merchant's subscription
     let api_key_2 = provision_merchant(&server).await;
@@ -337,7 +357,10 @@ async fn test_subscription_merchant_isolation() {
 
     let update_payload = json!({ "status": "paused" });
     let res = server
-        .patch(&format!("/v1/merchants/test-merchant/subscriptions/{}", sub_id))
+        .patch(&format!(
+            "/v1/merchants/test-merchant/subscriptions/{}",
+            sub_id
+        ))
         .add_header("Authorization", &auth_2)
         .json(&update_payload)
         .await;

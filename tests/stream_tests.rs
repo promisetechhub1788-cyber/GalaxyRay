@@ -1,4 +1,4 @@
-﻿//! Integration tests for the Horizon SSE stream listener.
+//! Integration tests for the Horizon SSE stream listener.
 //!
 //! Covers `stream_once`, `handle_stream_event`, and `run_stream_listener`
 //! using a wiremock server that returns `text/event-stream` responses.
@@ -12,15 +12,14 @@
 //!   in the query string.
 //! - Shutdown causes `run_stream_listener` to return promptly.
 
+use galaxyray::{
+    config::{AcceptedAsset, Config, ListenerMode},
+    db, horizon, AppState,
+};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
-use galaxyray::{
-    AppState,
-    config::{AcceptedAsset, Config, ListenerMode},
-    db, horizon,
-};
 use uuid::Uuid;
 use wiremock::matchers::{method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};

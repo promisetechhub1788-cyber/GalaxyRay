@@ -1,4 +1,4 @@
-﻿//! Pins the SQLite → Rust decode mappings `src/db.rs` relies on (issue #644).
+//! Pins the SQLite → Rust decode mappings `src/db.rs` relies on (issue #644).
 //!
 //! SQLite is dynamically typed, so every `query_scalar` / `query_as` /
 //! `Row::get` in the service leans on sqlx's per-type `compatible()` table to
@@ -14,10 +14,10 @@
 //! `db.rs` so a future sqlx bump that does change one fails here, by name,
 //! rather than in whichever integration test happens to reach that query.
 
-use sqlx::Row;
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
 use galaxyray::db;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use sqlx::Row;
+use std::str::FromStr;
 
 async fn pool() -> db::Db {
     let pool = SqlitePoolOptions::new()
@@ -51,11 +51,9 @@ async fn count_star_decodes_as_i64() {
     assert_eq!(has_column, 1);
 
     assert!(!db::memo_exists(&pool, "no-such-memo").await.unwrap());
-    assert!(
-        !db::merchant_exists(&pool, "no-such-merchant")
-            .await
-            .unwrap()
-    );
+    assert!(!db::merchant_exists(&pool, "no-such-merchant")
+        .await
+        .unwrap());
     assert_eq!(db::count_active_api_keys(&pool, "m1").await.unwrap(), 0);
 }
 

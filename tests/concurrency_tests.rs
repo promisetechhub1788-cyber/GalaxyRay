@@ -1,4 +1,4 @@
-﻿//! Concurrency tests for stream + poller double-settle (issue #155).
+//! Concurrency tests for stream + poller double-settle (issue #155).
 //!
 //! The Horizon stream listener and the interval poller both call
 //! `reconcile_payment` independently.  When the same on-chain transaction
@@ -25,17 +25,17 @@
 
 use std::sync::Arc;
 
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
-use std::str::FromStr;
 use galaxyray::{
-    AppState,
     config::{AcceptedAsset, Config, ListenerMode},
     db::{self, NewPayment},
-    horizon::{HorizonPayment, TransactionRef, reconcile_payment},
+    horizon::{reconcile_payment, HorizonPayment, TransactionRef},
+    AppState,
 };
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use std::str::FromStr;
 use wiremock::{
-    Mock, MockServer, ResponseTemplate,
     matchers::{method, path},
+    Mock, MockServer, ResponseTemplate,
 };
 
 // ── helpers ──────────────────────────────────────────────────────────────────
